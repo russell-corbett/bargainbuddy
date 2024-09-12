@@ -2,8 +2,8 @@ name: Deploy to Raspberry Pi
 
 
 env:
-  DISABLE_DEPLOY: true  # Set to true to disable, false to enable
-  
+  DISABLE_DEPLOY: ${{ true }}  # Set to true to disable, false to enable
+
 on:
   push:
     branches:
