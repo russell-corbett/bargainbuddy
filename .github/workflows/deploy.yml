@@ -1,9 +1,5 @@
 name: Deploy to Raspberry Pi
 
-
-env:
-  DISABLE_DEPLOY: ${{ true }}  # Set to true to disable, false to enable
-
 on:
   push:
     branches:
@@ -11,7 +7,9 @@ on:
 
 jobs:
   deploy:
-    if: ${{ vars.DISABLE_DEPLOY != 'true' }} # Disable condition
+    env:
+      DISABLE_DEPLOY: ${{ true }}  # Set to true to disable, false to enable
+    if: ${{ vars.DISABLE_DEPLOY != true }} 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
