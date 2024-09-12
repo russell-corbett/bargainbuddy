@@ -4,7 +4,7 @@ TrackSale is a web application that allows users to find the best deals on produ
 
 ## Installation
 
-To run the application, you will need to have Node.js installed on your machine. You can download Node.js from the official website: https://nodejs.org/en/download/
+To run the application, you will need to have Node.js installed on your machine. You can download Node.js from the official website: ```https://nodejs.org/en/download/```
 
 After installing Node.js, you can clone the repository and install the required dependencies by running the following commands:
 
