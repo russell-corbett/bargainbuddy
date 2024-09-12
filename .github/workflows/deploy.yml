@@ -1,37 +1,34 @@
-name: Deploy to Raspberry Pi
+# name: Deploy to Raspberry Pi
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  deploy:
-    env:
-      DISABLE_DEPLOY: ${{ true }}  # Set to true to disable, false to enable
-    if: ${{ vars.DISABLE_DEPLOY != true }} 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v2
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v1.14.1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Log in to the Container registry
+#         uses: docker/login-action@v1.14.1
+#         with:
+#           registry: ghcr.io
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2.10.0
-        with:
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
+#       - name: Build and push Docker image
+#         uses: docker/build-push-action@v2.10.0
+#         with:
+#           push: true
+#           tags: ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:latest
 
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          script: ./update.sh
+#       - name: executing remote ssh commands using password
+#         uses: appleboy/ssh-action@v0.1.10
+#         with:
+#           host: ${{ secrets.HOST }}
+#           username: ${{ secrets.USERNAME }}
+#           password: ${{ secrets.PASSWORD }}
+#           script: ./update.sh
