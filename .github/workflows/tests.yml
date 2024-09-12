@@ -1,4 +1,4 @@
-name: Tests
+name: ESLint Tests
 on: push
 jobs:
   build:
