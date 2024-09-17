@@ -1,6 +1,6 @@
-# DesignTeam6400 - TrackSale
+# DesignTeam6400 - BargainBuddy
 
-TrackSale is a web application that allows users to find the best deals on products from various online retailers. Users can search for products and view the best deals available from multiple retailers. Users can also create an account to save their favorite products and receive notifications when the price of a product drops. BargainBuddy is designed to help users save money by finding the best deals on products they are interested in.
+BargainBuddy is a web application that allows users to find the best deals on products from various online retailers. Users can search for products and view the best deals available from multiple retailers. Users can also create an account to save their favorite products and receive notifications when the price of a product drops. BargainBuddy is designed to help users save money by finding the best deals on products they are interested in.
 
 ## Installation
 
@@ -9,7 +9,7 @@ To run the application, you will need to have Node.js installed on your machine.
 After installing Node.js, you can clone the repository and install the required dependencies by running the following commands:
 
 ```bash
-git clone https://github.com/Foul-Trouble/DesignTeam6400
+git clone https://github.com/russell-corbett/bargainbuddy
 npm install
 ```
 
@@ -25,7 +25,7 @@ npm run dev
 or to connect to the production server, go to the following link:
 
 ```bash
-http://tracksale.russellcorbett.ca/
+http://bargainbuddy.russellcorbett.ca/
 ```
 
 ## Technologies Used
