@@ -1,16 +1,35 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-
-model Post {
-  id      String   @id @default(cuid())
-  name    String
+model User {
+  id       String   @id @default(cuid())
+  email    String   @unique
+  name     String?
+  password String
+  items    Item[]   @relation("UserItems")  // Define a many-to-many relation
+  joinDate DateTime @default(now())
+  // Define a relation to the pivot table
+  userItems UserItem[]
+}
+model Item {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  users       User[]   @relation("UserItems")  // Define a many-to-many relation
+  // Define a relation to the pivot table
+  userItems   UserItem[]
+}
+// Join table for many-to-many relationship between User and Item
+model UserItem {
+  userId String
+  itemId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  @@id([userId, itemId])  // Composite primary key for uniqueness
 }
