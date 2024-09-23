@@ -21,7 +21,7 @@ app.post("/create", async (req, res) => {
   const { model, data } = req.body;
 
   // Validate the model
-  if (model !== "Post") {
+  if (model !== "User" || model !== "Item" || model !== "UserItem") {
     return res.status(400).json({ error: "Invalid model name" });
   }
 
