@@ -21,6 +21,8 @@ model Item {
   id          String   @id @default(cuid())
   name        String
   description String?
+  currentPrice  Float
+  priceHistory Price[]
   users       User[]   @relation("UserItems")  // Define a many-to-many relation
   // Define a relation to the pivot table
   userItems   UserItem[]
@@ -32,4 +34,14 @@ model UserItem {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
   @@id([userId, itemId])  // Composite primary key for uniqueness
+}
+
+// Price history table
+model Price {
+  id        String   @id @default(cuid())
+  date      DateTime
+  price     Float
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    String
+  createdAt DateTime @default(now())
 }
