@@ -1,0 +1,25 @@
+1. On click functionality for frontend 'search' button
+onSerach()
+{
+    socket.emit('item_Searched', (data) =>
+    {
+        modelNumber = data.modelNumber
+    })
+}
+
+2. Backend receives the model Number
+checkDatabase()
+{
+    socket.on('item_Searched', data)
+
+    newItem = data
+
+    if newItem == in database
+    {
+        add to userItem
+    }
+    else
+    {
+        create the item by finding what stores it is availiable at
+    }
+}
