@@ -1,0 +1,42 @@
+name: Test Backend
+
+on: [push, pull_request]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: ./backend
+
+    - name: Run backend in the background
+      run: |
+        npm run dev > output.log 2>&1 &
+      working-directory: ./backend
+
+    - name: Wait for a few seconds to let the server start
+      run: sleep 10
+
+    - name: Wait for backend to start
+      run: |
+        for i in {1..5}; do
+          if curl -s http://localhost:3001/; then
+            echo "Backend is running good"
+            exit 0
+          fi
+          echo "Waiting for backend..."
+          sleep 5
+        done
+        echo "Backend did not start in time"
+        exit 1
+      working-directory: ./backend
