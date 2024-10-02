@@ -23,7 +23,7 @@ jobs:
       run: |
         for i in {1..5}; do
           if curl -s http://localhost:3001/; then  # Replace with your actual health check URL
-            echo "Backend is running"
+            echo "Backend is running good"
             exit 0
           fi
           echo "Waiting for backend..."
