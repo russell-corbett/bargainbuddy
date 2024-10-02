@@ -17,11 +17,11 @@ jobs:
 
     - name: Install dependencies
       run: npm install
-      working-directory: /frontend
+      working-directory: ./frontend
 
     - name: Run Frontend
       run: npm run dev
-      working-directory: /frontend
+      working-directory: ./frontend
 
     - name: Check for errors
       run: |
@@ -31,4 +31,4 @@ jobs:
         else
           echo "No errors found"
         fi
-      working-directory: /frontend
+      working-directory: ./frontend

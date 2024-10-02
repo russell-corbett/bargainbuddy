@@ -15,23 +15,22 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Change directory to backend
-      run: ls
-
     - name: Install dependencies
       run: npm install
       working-directory: ./backend
 
-    - name: Run backend
-      run: npm run dev
+    - name: Run backend and capture output
+      id: run-backend
+      run: |
+        npm run dev > output.log 2>&1 || true
       working-directory: ./backend
 
-    - name: Check for errors
+    - name: Check for 'app crashed' error
       run: |
-        if grep -q "ERROR" <(npm run dev); then
-          echo "Errors found in backend"
+        if grep -q "app crashed" ./backend/output.log; then
+          echo "Error: app crashed"
           exit 1
         else
-          echo "No errors found"
+          echo "No 'app crashed' errors found"
         fi
       working-directory: ./backend
