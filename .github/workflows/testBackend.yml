@@ -19,9 +19,13 @@ jobs:
       run: npm install
       working-directory: ./backend
 
-    - name: Run Backend
-      run: npm run dev
+    - name: Run backend in the background
+      run: |
+        npm run dev > output.log 2>&1 &
       working-directory: ./backend
+
+    - name: Wait for a few seconds to let the server start
+      run: sleep 10
 
     - name: Wait for backend to start
       run: |
