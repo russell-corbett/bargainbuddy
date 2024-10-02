@@ -1,9 +1,9 @@
-name: Test Backend
+name: Test Frontend
 
 on: [push, pull_request]
 
 jobs:
-  test-backend:
+  test-frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,14 +19,14 @@ jobs:
       run: npm install
       working-directory: /frontend
 
-    - name: Run backend
+    - name: Run Frontend
       run: npm run dev
       working-directory: /frontend
 
     - name: Check for errors
       run: |
         if grep -q "ERROR" <(npm run dev); then
-          echo "Errors found in backend"
+          echo "Errors found in frontend"
           exit 1
         else
           echo "No errors found"
