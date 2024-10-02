@@ -1,3 +1,5 @@
+/*
+//Holding these until I find where I put them, required for linking to Firebase
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -15,6 +17,8 @@ const firebaseConfig = {
   appId: "1:735437299454:web:f37a51ceeeef48a291cfaf",
   measurementId: "G-LQKS57DWDE"
 };
+*/
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
