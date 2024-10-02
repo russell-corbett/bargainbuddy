@@ -19,16 +19,24 @@ jobs:
       run: npm install
       working-directory: ./frontend
 
-    - name: Run Frontend
-      run: npm run dev
+    - name: Run frontend in the background
+      run: |
+        npm run dev > output.log 2>&1 &
       working-directory: ./frontend
 
-    - name: Check for errors
+    - name: Wait for a few seconds to let the server start
+      run: sleep 10
+
+    - name: Wait for frontend to start
       run: |
-        if grep -q "ERROR" <(npm run dev); then
-          echo "Errors found in frontend"
-          exit 1
-        else
-          echo "No errors found"
-        fi
+        for i in {1..5}; do
+          if curl -s http://localhost:3000/; then
+            echo "Front is running good"
+            exit 0
+          fi
+          echo "Waiting for frontend..."
+          sleep 5
+        done
+        echo "Frontend did not start in time"
+        exit 1
       working-directory: ./frontend
