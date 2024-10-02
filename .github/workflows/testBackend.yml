@@ -30,7 +30,7 @@ jobs:
     - name: Wait for backend to start
       run: |
         for i in {1..5}; do
-          if curl -s http://localhost:3001/;
+          if curl -s http://localhost:3001/; then
             echo "Backend is running good"
             exit 0
           fi
