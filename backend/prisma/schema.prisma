@@ -8,40 +8,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model User {
-  id       String   @id @default(cuid())
-  email    String   @unique
-  name     String?
-  password String
-  items    Item[]   @relation("UserItems")  // Define a many-to-many relation
+  id       Int @id @default(autoincrement())
+  email       String @unique
+  username    String @unique
+  password    String
+  displayName String?
+  avatarUrl   String?
+  items    Item[]   @relation("UserItems")
   joinDate DateTime @default(now())
-  // Define a relation to the pivot table
   userItems UserItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 model Item {
   id          String   @id @default(cuid())
   name        String
   description String?
-  currentPrice  Float
+  currentPrice  Float?
+  modelNumber String
   priceHistory Price[]
-  users       User[]   @relation("UserItems")  // Define a many-to-many relation
-  // Define a relation to the pivot table
+  users       User[]   @relation("UserItems")
   userItems   UserItem[]
 }
 // Join table for many-to-many relationship between User and Item
 model UserItem {
-  userId String
+  userId Int
   itemId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id])
+  item   Item @relation(fields: [itemId], references: [id])
   @@id([userId, itemId])  // Composite primary key for uniqueness
 }
 
 // Price history table
 model Price {
   id        String   @id @default(cuid())
-  date      DateTime
+  date      DateTime @default(now())
+  store     String
   price     Float
   item      Item     @relation(fields: [itemId], references: [id])
   itemId    String
-  createdAt DateTime @default(now())
 }
