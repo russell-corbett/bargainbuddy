@@ -21,7 +21,11 @@ model Item {
   id          String   @id @default(cuid())
   name        String
   description String?
+  amazonId    String?
+  bestBuyId   String?
+  walmartId   String?
   currentPrice  Float
+  
   priceHistory Price[]
   users       User[]   @relation("UserItems")  // Define a many-to-many relation
   // Define a relation to the pivot table
@@ -39,9 +43,10 @@ model UserItem {
 // Price history table
 model Price {
   id        String   @id @default(cuid())
-  date      DateTime
   price     Float
+  date      DateTime @default(now())
+  store     String
+  
   item      Item     @relation(fields: [itemId], references: [id])
   itemId    String
-  createdAt DateTime @default(now())
 }

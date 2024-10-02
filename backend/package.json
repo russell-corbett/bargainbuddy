@@ -11,9 +11,13 @@
   "author": "Russell Corbett",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.19.1",
+    "@prisma/client": "^5.20.0",
+    "axios": "^1.7.7",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.3",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
     "next": "^14.2.12",
     "socket.io": "^4.7.5",
     "sqlite3": "^5.1.7"
@@ -21,6 +25,6 @@
   "keywords": [],
   "devDependencies": {
     "nodemon": "^3.1.5",
-    "prisma": "^5.19.1"
+    "prisma": "^5.20.0"
   }
 }
