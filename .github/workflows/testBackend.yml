@@ -15,13 +15,16 @@ jobs:
       with:
         node-version: '20'
 
+    - name: Change directory to backend
+      run: ls
+
     - name: Install dependencies
       run: npm install
-      working-directory: /backend
+      working-directory: ./backend
 
     - name: Run backend
       run: npm run dev
-      working-directory: /backend
+      working-directory: ./backend
 
     - name: Check for errors
       run: |
@@ -31,4 +34,4 @@ jobs:
         else
           echo "No errors found"
         fi
-      working-directory: /backend
+      working-directory: ./backend
