@@ -1,0 +1,37 @@
+name: Test Backend
+
+on: [push, pull_request]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Change directory to /backend
+      run: cd /backend
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: /backend
+
+    - name: Run backend
+      run: npm run dev
+      working-directory: /backend
+
+    - name: Check for errors
+      run: |
+        if grep -q "ERROR" <(npm run dev); then
+          echo "Errors found in backend"
+          exit 1
+        else
+          echo "No errors found"
+        fi
+      working-directory: /backend
