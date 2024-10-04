@@ -21,14 +21,20 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
+
+// const app = initializeApp(firebaseConfig);
+// const analytics = getAnalytics(app);
 
 
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const Database = require("./database");
+
+const ItemSearchService = require('./microServices/itemSearchService.js');
+
+
 
 const app = express();
 const port = 3001;
@@ -44,6 +50,7 @@ const db = new Database();
 
 app.use(express.json());
 
+// User routes (Needs email and password)
 app.post("/createUser", async (req, res) => {
   //Check to see if the email is unique
   const email = req.body.email;
@@ -144,6 +151,62 @@ app.post("/updateItem", async (req, res) => {
 	}
 });
 
+app.post("/connectUserItem", async (req, res) => {
+	const email = req.body.email;
+	const user = await db.getRecord("User", { email });
+	if (!user) {
+		return res.status(400).json({ error: "User does not exist" });
+	}
+	const name = req.body.name;
+	const modelNumber = req.body.modelNumber;
+	const item = await db.getRecord("Item", { name, modelNumber });
+	if (!item) {
+		return res.status(400).json({ error: "Item does not exist" });
+	}
+	try {
+		const record = await db.createRecord("UserItem", req.body);
+		res.status(201).json(record);
+	} catch (error) {
+		res.status(500).json({ error: "Error creating record" });
+	}
+});
+
+app.post("/disconnectUserItem", async (req, res) => {
+	const email = req.body.email;
+	const user = await db.getRecord("User", { email });
+	if (!user) {
+		return res.status(400).json({ error: "User does not exist" });
+	}
+	const name = req.body.name;
+	const modelNumber = req.body.modelNumber;
+	const item = await db.getRecord("Item", { name, modelNumber });
+	if (!item) {
+		return res.status(400).json({ error: "Item does not exist" });
+	}
+	try {
+		const record = await db.deleteRecord("UserItem", req.body);
+		res.status(201).json(record);
+	} catch (error) {
+		res.status(500).json({ error: "Error deleting record" });
+	}
+});
+
+app.post("createPriceLog", async (req, res) => {
+	const name = req.body.itemId;
+	const store = req.body.store;
+	const price = req.body.price;
+	const item = await db.getRecord("Item", { itemId });
+	if (!item) {
+		return res.status(400).json({ error: "Item does not exist" });
+	}
+	try {
+		const record = await db.createRecord("Price", req.body);
+		res.status(201).json(record);
+	} catch (error) {
+		res.status(500).json({ error: "Error creating record" });
+	}
+});
+
 // Close the database connection on server shutdown
 process.on("SIGINT", async () => {
 	await db.close();
@@ -160,9 +223,13 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
 	console.log(`New client connected ${socket.id}`);
 
-	socket.on("disconnect", () => {
-		console.log(`Client has disconnected ${socket.id}`);
-	});
+  socket.on("disconnect", () => {
+    console.log(`Client has disconnected ${socket.id}`);
+  });
+
+  socket.on("modelNumber", (data) => {
+    console.log("ModelNumber event");
+  });
 });
 
 server.listen(port, () => {

@@ -24,8 +24,12 @@ model Item {
   id          String   @id @default(cuid())
   name        String
   description String?
+  amazonId    String?
+  bestBuyId   String?
+  walmartId   String?
   currentPrice  Float?
   modelNumber String
+
   priceHistory Price[]
   users       User[]   @relation("UserItems")
   userItems   UserItem[]
