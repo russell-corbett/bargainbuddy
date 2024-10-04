@@ -1,0 +1,19 @@
+OnAddToWishlist()
+{
+    socket.emit('item_Added', (data) =>
+    {
+        modelNumber = data.modelNumber
+    })
+
+    add to userItem database
+}
+
+OnRemoveFromWishlist()
+{
+    socket.emit('item_Removed', (data) =>
+    {
+        modelNumber = data.modelNumber
+    })
+
+    remove from userItem database
+}
