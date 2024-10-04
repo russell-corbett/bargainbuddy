@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { socket } from "../app/socket";
 
 export default function Home() {
-  const [isConnected, setIsConnected] = useState(false);
-  const [transport, setTransport] = useState("N/A");
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [transport, setTransport] = useState<string>("N/A");
+  const [modelNumber, setModelNumber] = useState<number>(0);
 
   useEffect(() => {
     if (socket.connected) {
@@ -15,8 +16,12 @@ export default function Home() {
     function onConnect() {
       setIsConnected(true);
       setTransport(socket.io.engine.transport.name);
-      socket.io.engine.on("upgrade", (transport) => {
+      socket.io.engine.on("upgrade", (transport: any) => {
         setTransport(transport.name);
+      });
+
+      socket.emit("modelNumber", (data: number) => {
+        setModelNumber(data);
       });
 
       console.log("Hello from the frontend");
@@ -40,6 +45,7 @@ export default function Home() {
     <div>
       <p>Status: {isConnected ? "connected" : "disconnected"}</p>
       <p>Transport: {transport}</p>
+      <p>Model Number: {modelNumber}</p>
     </div>
   );
 }

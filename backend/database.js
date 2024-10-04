@@ -5,32 +5,18 @@ class Database {
     this.prisma = new PrismaClient();
   }
 
-  async createRecord(model, data) {
-    console.log(data);
-    return await this.prisma[model].create({ data });
-  }
+  async register(email, password) {
+    try {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { email },
+      });
 
-  async getRecord(model, where) {
-    return await this.prisma[model].findUnique({ where });
-  }
-
-  async updateRecord(model, where, data) {
-    return await this.prisma[model].update({
-      where,
-      data,
-    });
-  }
-
-  async deleteRecord(model, where) {
-    return await this.prisma[model].delete({ where });
-  }
-
-  async getAllRecords(model) {
-    return await this.prisma[model].findMany();
-  }
-
-  async close() {
-    await this.prisma.$disconnect();
+      if (existingUser) {
+        throw new Error("User already exists");
+      }
+    } catch (error) {
+      throw new Error(`Registration failed: ${error.message}`);
+    }
   }
 }
 

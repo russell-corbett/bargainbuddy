@@ -32,6 +32,10 @@ const http = require("http");
 const socketIO = require("socket.io");
 const Database = require("./database");
 
+const ItemSearchService = require('./microServices/itemSearchService.js');
+
+
+
 const app = express();
 const port = 3001;
 const server = http.createServer(app);
@@ -162,9 +166,13 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
 	console.log(`New client connected ${socket.id}`);
 
-	socket.on("disconnect", () => {
-		console.log(`Client has disconnected ${socket.id}`);
-	});
+  socket.on("disconnect", () => {
+    console.log(`Client has disconnected ${socket.id}`);
+  });
+
+  socket.on("modelNumber", (data) => {
+    console.log("ModelNumber event");
+  });
 });
 
 server.listen(port, () => {
