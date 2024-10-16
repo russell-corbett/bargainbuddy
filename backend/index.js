@@ -34,8 +34,6 @@ const Database = require("./database");
 
 const ItemSearchService = require('./microServices/itemSearchService.js');
 
-
-
 const app = express();
 const port = 3001;
 const server = http.createServer(app);
@@ -120,11 +118,18 @@ app.post("/deleteUser", async (req, res) => {
 	}
 });
 
+app.post("/createUser", async (req, res) => {
+  //Check to see if the email is unique
+  const email = req.body.email;
+  const user = await db.getRecord("User", { email });
+  if (user) {
+    return res.status(400).json({ error: "Email already exists" });
+  }})
+
 // Item routes (Needs name and model number)
 app.post("/createItem", async (req, res) => {
-	const name = req.body.name;
 	const modelNumber = req.body.modelNumber;
-	const item = await db.getRecord("Item", { name, modelNumber });
+	const item = await db.getRecord("Item", { modelNumber });
 	if (item) {
 		return res.status(400).json({ error: "Item already exists" });
 	}
@@ -152,24 +157,45 @@ app.post("/updateItem", async (req, res) => {
 });
 
 app.post("/connectUserItem", async (req, res) => {
-	const email = req.body.email;
-	const user = await db.getRecord("User", { email });
-	if (!user) {
-		return res.status(400).json({ error: "User does not exist" });
-	}
-	const name = req.body.name;
-	const modelNumber = req.body.modelNumber;
-	const item = await db.getRecord("Item", { name, modelNumber });
-	if (!item) {
-		return res.status(400).json({ error: "Item does not exist" });
-	}
-	try {
-		const record = await db.createRecord("UserItem", req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error creating record" });
-	}
+  const email = req.body.email;
+  const modelNumber = req.body.modelNumber;
+
+  try {
+    // Get the User by email
+    const user = await db.getRecord("User", { email });
+    if (!user) {
+      return res.status(400).json({ error: "User does not exist" });
+    }
+
+    // Get the Item by name and modelNumber
+    const item = await db.getRecord("Item", { modelNumber });
+    if (!item) {
+      return res.status(400).json({ error: "Item does not exist" });
+    }
+
+		// Check if the UserItem record already exists
+		const userItem = await db.getRecord("UserItem", {
+			userId: user.id,
+			itemId: item.id,
+		});
+		if (userItem) {
+			return res.status(400).json({ error: "UserItem already exists" });
+		}
+
+    // Create UserItem record by passing userId and itemId
+    const record = await db.createRecord("UserItem", {
+      userId: user.id,
+      itemId: item.id,
+    });
+
+    // Respond with the newly created record
+    res.status(201).json(record);
+  } catch (error) {
+    console.error(error);  // Log the error for debugging
+    res.status(500).json({ error: "Error creating record" });
+  }
 });
+
 
 app.post("/disconnectUserItem", async (req, res) => {
 	const email = req.body.email;
@@ -190,6 +216,30 @@ app.post("/disconnectUserItem", async (req, res) => {
 		res.status(500).json({ error: "Error deleting record" });
 	}
 });
+
+app.post("/getUserItems", async (req, res) => {
+  const email = req.body.email;
+  try {
+    // Get the User by email
+    const user = await db.getRecord("User", { email });
+    if (!user) {
+      return res.status(400).json({ error: "User does not exist" });
+    }
+
+    // Fetch all UserItems for the given userId and include the associated Item data
+    const userItems = await db.prisma.userItem.findMany({
+      where: { userId: user.id },
+      include: { item: true },
+    });
+
+    // Respond with the list of items
+    res.status(200).json(userItems);
+  } catch (error) {
+    console.error(error);  // Log the error for debugging
+    res.status(500).json({ error: "Error fetching user items" });
+  }
+});
+
 
 app.post("createPriceLog", async (req, res) => {
 	const name = req.body.itemId;

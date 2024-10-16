@@ -17,19 +17,17 @@ model User {
   items    Item[]   @relation("UserItems")
   joinDate DateTime @default(now())
   userItems UserItem[]
-  createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 model Item {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String?
   amazonId    String?
   bestBuyId   String?
   walmartId   String?
   currentPrice  Float?
-  modelNumber String
-
+  modelNumber String?  @unique
   priceHistory Price[]
   users       User[]   @relation("UserItems")
   userItems   UserItem[]
