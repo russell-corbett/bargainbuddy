@@ -1,277 +1,41 @@
-/*
-//Holding these until I find where I put them, required for linking to Firebase
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyA86tDTFZ3MlfOnkOIVC5-rEJv3eIKKe8Y",
-  authDomain: "bargainbuddy-99abb.firebaseapp.com",
-  projectId: "bargainbuddy-99abb",
-  storageBucket: "bargainbuddy-99abb.appspot.com",
-  messagingSenderId: "735437299454",
-  appId: "1:735437299454:web:f37a51ceeeef48a291cfaf",
-  measurementId: "G-LQKS57DWDE"
-};
-*/
-
-
-// Initialize Firebase
-
-
-// const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
-
-
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const Database = require("./database");
-
-const ItemSearchService = require('./microServices/itemSearchService.js');
+const userRoutes = require("./routes/userRoutes");
+const itemRoutes = require("./routes/itemRoutes");
 
 const app = express();
 const port = 3001;
 const server = http.createServer(app);
 const io = socketIO(server, {
-	cors: {
-		origin: "http://localhost:3000",
-		methods: ["GET", "POST"],
-	},
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
 
-const db = new Database();
+const db = Database;
 
 app.use(express.json());
-
-// User routes (Needs email and password)
-app.post("/createUser", async (req, res) => {
-  //Check to see if the email is unique
-  const email = req.body.email;
-  const user = await db.getRecord("User", { email });
-  if (user) {
-    return res.status(400).json({ error: "Email already exists" });
-  }
-  //check to see if the email is valid
-  if (!email.includes("@") || !email.includes(".")) {
-    return res.status(400).json({ error: "Email is not valid" });
-  }
-  //check to see if the password is secure
-  const password = req.body.password;
-  if (password.length < 8) {
-    return res.status(400).json({ error: "Password is too short" });
-  }
-  if (!password.match(/[A-Z]/)) {
-    return res.status(400).json({ error: "Password does not contain a capital letter" });
-  }
-	try {
-		const record = await db.createRecord("User", req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error creating record" });
-	}
-});
-
-app.post("/updateUser", async (req, res) => {
-	const email = req.body.email;
-	const user = await db.getRecord("User", { email });
-	if (!user) {
-		return res.status(400).json({ error: "Account does not exist" });
-	}
-	//check to see if the email is valid
-	if (!email.includes("@") || !email.includes(".")) {
-		return res.status(400).json({ error: "Email is not valid" });
-	}
-
-	//check to see if the password is secure
-	const password = req.body.password;
-	if (password.length < 8) {
-		return res.status(400).json({ error: "Password is too short" });
-	}
-	if (!password.match(/[A-Z]/)) {
-		return res.status(400).json({ error: "Password does not contain a capital letter" });
-	}
-	try {
-		const record = await db.updateRecord("User", { email }, req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error updating record" });
-	}
-});
-
-app.post("/deleteUser", async (req, res) => {
-  const email = req.body.email;
-  const user = await db.getRecord("User", { email });
-  if (!user) {
-    return res.status(400).json({ error: "Account does not exist" });
-  }
-
-	try {
-		const record = await db.deleteRecord("User", req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error deleting record" });
-	}
-});
-
-app.post("/createUser", async (req, res) => {
-  //Check to see if the email is unique
-  const email = req.body.email;
-  const user = await db.getRecord("User", { email });
-  if (user) {
-    return res.status(400).json({ error: "Email already exists" });
-  }})
-
-// Item routes (Needs name and model number)
-app.post("/createItem", async (req, res) => {
-	const modelNumber = req.body.modelNumber;
-	const item = await db.getRecord("Item", { modelNumber });
-	if (item) {
-		return res.status(400).json({ error: "Item already exists" });
-	}
-	try {
-		const record = await db.createRecord("Item", req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error creating record" });
-	}
-});
-
-app.post("/updateItem", async (req, res) => {
-	const name = req.body.name;
-	const modelNumber = req.body.modelNumber;
-	const item = await db.getRecord("Item", { name, modelNumber });
-	if (!item) {
-		return res.status(400).json({ error: "Item does not exist" });
-	}
-	try {
-		const record = await db.updateRecord("Item", { name, modelNumber }, req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error updating record" });
-	}
-});
-
-app.post("/connectUserItem", async (req, res) => {
-  const email = req.body.email;
-  const modelNumber = req.body.modelNumber;
-
-  try {
-    // Get the User by email
-    const user = await db.getRecord("User", { email });
-    if (!user) {
-      return res.status(400).json({ error: "User does not exist" });
-    }
-
-    // Get the Item by name and modelNumber
-    const item = await db.getRecord("Item", { modelNumber });
-    if (!item) {
-      return res.status(400).json({ error: "Item does not exist" });
-    }
-
-		// Check if the UserItem record already exists
-		const userItem = await db.getRecord("UserItem", {
-			userId: user.id,
-			itemId: item.id,
-		});
-		if (userItem) {
-			return res.status(400).json({ error: "UserItem already exists" });
-		}
-
-    // Create UserItem record by passing userId and itemId
-    const record = await db.createRecord("UserItem", {
-      userId: user.id,
-      itemId: item.id,
-    });
-
-    // Respond with the newly created record
-    res.status(201).json(record);
-  } catch (error) {
-    console.error(error);  // Log the error for debugging
-    res.status(500).json({ error: "Error creating record" });
-  }
-});
-
-
-app.post("/disconnectUserItem", async (req, res) => {
-	const email = req.body.email;
-	const user = await db.getRecord("User", { email });
-	if (!user) {
-		return res.status(400).json({ error: "User does not exist" });
-	}
-	const name = req.body.name;
-	const modelNumber = req.body.modelNumber;
-	const item = await db.getRecord("Item", { name, modelNumber });
-	if (!item) {
-		return res.status(400).json({ error: "Item does not exist" });
-	}
-	try {
-		const record = await db.deleteRecord("UserItem", req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error deleting record" });
-	}
-});
-
-app.post("/getUserItems", async (req, res) => {
-  const email = req.body.email;
-  try {
-    // Get the User by email
-    const user = await db.getRecord("User", { email });
-    if (!user) {
-      return res.status(400).json({ error: "User does not exist" });
-    }
-
-    // Fetch all UserItems for the given userId and include the associated Item data
-    const userItems = await db.prisma.userItem.findMany({
-      where: { userId: user.id },
-      include: { item: true },
-    });
-
-    // Respond with the list of items
-    res.status(200).json(userItems);
-  } catch (error) {
-    console.error(error);  // Log the error for debugging
-    res.status(500).json({ error: "Error fetching user items" });
-  }
-});
-
-
-app.post("createPriceLog", async (req, res) => {
-	const name = req.body.itemId;
-	const store = req.body.store;
-	const price = req.body.price;
-	const item = await db.getRecord("Item", { itemId });
-	if (!item) {
-		return res.status(400).json({ error: "Item does not exist" });
-	}
-	try {
-		const record = await db.createRecord("Price", req.body);
-		res.status(201).json(record);
-	} catch (error) {
-		res.status(500).json({ error: "Error creating record" });
-	}
-});
+app.use(userRoutes);
+app.use(itemRoutes);
 
 // Close the database connection on server shutdown
 process.on("SIGINT", async () => {
-	await db.close();
-	server.close(() => {
-		console.log("Server closed");
-		process.exit(0);
-	});
+  await db.close();
+  server.close(() => {
+    console.log("Server closed");
+    process.exit(0);
+  });
 });
 
 app.get("/", (req, res) => {
-	res.send("Hello World!");
+  res.send("Hello World!");
 });
 
 io.on("connection", (socket) => {
-	console.log(`New client connected ${socket.id}`);
+  console.log(`New client connected ${socket.id}`);
 
   socket.on("disconnect", () => {
     console.log(`Client has disconnected ${socket.id}`);
@@ -283,5 +47,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-	console.log("Server is listening. ");
+  console.log("Server is listening.");
 });

@@ -6,8 +6,11 @@ class Database {
   }
 
   async getRecord(model, where) {
+    console.log(model, where);
     try {
-      return await this.prisma[model].findUnique({ where });
+      return await this.prisma[model].findFirst({
+        where: where,
+      });
     } catch (error) {
       throw new Error(`Error getting record: ${error.message}`);
     }
@@ -52,4 +55,4 @@ class Database {
   }
 }
 
-module.exports = Database;
+module.exports = new Database();
