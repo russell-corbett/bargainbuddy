@@ -15,22 +15,20 @@ model User {
   displayName String?
   avatarUrl   String?
   items    Item[]   @relation("UserItems")
-  joinDate DateTime @default(now())
   userItems UserItem[]
+  joinDate DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 model Item {
   id          String    @id @default(cuid())
   name        String
   description String?
-  amazonId    String?
-  bestBuyId   String?
-  walmartId   String?
+  itemImg     String?
   currentPrice  Float?
-  modelNumber String?  @unique
   priceHistory Price[]
   users       User[]   @relation("UserItems")
   userItems   UserItem[]
+  storeIds    StoreID[]
 }
 // Join table for many-to-many relationship between User and Item
 model UserItem {
@@ -47,6 +45,14 @@ model Price {
   date      DateTime @default(now())
   store     String
   price     Float
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    String
+}
+
+model StoreID {
+  id        String      @id @default(cuid())
+  store     String
+  storeId   String
   item      Item     @relation(fields: [itemId], references: [id])
   itemId    String
 }
