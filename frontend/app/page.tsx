@@ -1,7 +1,6 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { socket } from "../app/socket";
+import { useEffect, useState } from 'react';
+import { socket } from './socket';
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -23,8 +22,6 @@ export default function Home() {
       socket.emit("modelNumber", (data: number) => {
         setModelNumber(data);
       });
-
-      console.log("Hello from the frontend");
     }
 
     function onDisconnect() {
@@ -42,8 +39,9 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
-      <p>Status: {isConnected ? "connected" : "disconnected"}</p>
+    <div className="p-8">
+      <h1 className="text-4xl font-semibold">Bargain Buddy</h1>
+      <p>Status: {isConnected ? "Connected" : "Disconnected"}</p>
       <p>Transport: {transport}</p>
       <p>Model Number: {modelNumber}</p>
     </div>

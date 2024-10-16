@@ -1,32 +1,38 @@
-// Nav that appears on the left hand side of the screen, it contains the links to the different pages of the app
+"use client";
 
-import { Link } from "react-router-dom";
-import { useAuth } from "../context/auth";
+
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 export default function Nav() {
-  const { user } = useAuth();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const handleSearchToggle = () => setIsSearchOpen(!isSearchOpen);
+
   return (
-    <nav>
-      <ul>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/about">About</Link>
-        </li>
-        <li>
-          <Link to="/profile">Profile</Link>
-        </li>
-        {user ? (
-          <li>
-            <Link to="/logout">Logout</Link>
-          </li>
-        ) : (
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
-        )}
-      </ul>
+    <nav className="flex justify-between items-center p-4 bg-white border-b">
+      <div className="text-lime-800 text-3xl font-semibold">Bargain Buddy</div>
+      <div className="space-x-8">
+        <Link href="/profile">My Profile</Link>
+        <Link href="/groceries">Groceries</Link>
+        <Link href="/tech">Technology</Link>
+        <Link href="/settings">Settings</Link>
+        <Link href="/search">Search</Link>
+      </div>
+      <button className="bg-lime-800 text-white px-4 py-2 rounded" onClick={handleSearchToggle}>Search</button>
+      {isSearchOpen && (
+        <div className="absolute top-0 left-0 w-full bg-gray-100 p-4">
+          <form className="flex items-center space-x-4">
+            <input
+              type="text"
+              className="flex-1 px-4 py-2 border rounded-lg"
+              placeholder="Paste product link here..."
+            />
+            <button className="px-4 py-2 bg-lime-800 text-white rounded-lg">
+              Add to Wishlist
+            </button>
+          </form>
+        </div>
+      )}
     </nav>
   );
 }

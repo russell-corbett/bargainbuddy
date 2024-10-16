@@ -1,20 +1,24 @@
-import { ReactNode } from 'react';
-import NextLink from 'next/link';
+"use client";
 
-export { Link };
+import { useRouter } from 'next/router';
+import React from 'react';
 
-interface LinkProps {
-    href: string;
-    children: ReactNode;
-    [key: string]: any;
+interface Props {
+  href: string;
+  children: React.ReactNode;
 }
 
-function Link({ href, children, ...props }: LinkProps) {
-    return (
-        <NextLink href={href}>
-            <a {...props}>
-                {children}
-            </a>
-        </NextLink>
-    );
+export default function Link({ href, children }: Props) {
+  const router = useRouter();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(href);
+  };
+
+  return (
+    <a href={href} onClick={handleClick} className="text-black">
+      {children}
+    </a>
+  );
 }
