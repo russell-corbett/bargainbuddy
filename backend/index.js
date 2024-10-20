@@ -7,6 +7,7 @@ const userRoutes = require("./api/endpoints/user/userRoutes");
 const itemRoutes = require("./api/endpoints/item/itemRoutes");
 const priceRoutes = require("./api/endpoints/price/priceRoutes");
 const trendRoutes = require("./api/endpoints/trend/trendRoutes");
+const bestBuyApi = require("../backend//microServices//BestBuyService");
 
 const app = express();
 const port = 3001;
@@ -19,6 +20,8 @@ const io = socketIO(server, {
 });
 
 const db = Database;
+
+const bestBuyApiRef = new bestBuyApi();
 
 // Enable CORS for all routes
 app.use(cors());
@@ -47,6 +50,11 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log(`Client has disconnected ${socket.id}`);
+  });
+
+  socket.on("addToWishlist", (data) => {
+    // console.log(data.modelNumber);
+    bestBuyApiRef.searchBestBuy(data.modelNumber);
   });
 
   socket.on("modelNumber", (data) => {
