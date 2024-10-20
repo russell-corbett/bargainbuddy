@@ -11,33 +11,30 @@ model User {
   id       Int @id @default(autoincrement())
   email       String @unique
   username    String @unique
-  password    String
+  token    String
   displayName String?
   avatarUrl   String?
   items    Item[]   @relation("UserItems")
-  joinDate DateTime @default(now())
   userItems UserItem[]
-  createdAt   DateTime @default(now())
+  joinDate DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 model Item {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
+  modelNumber String @unique
   description String?
-  amazonId    String?
-  bestBuyId   String?
-  walmartId   String?
+  itemImg     String?
   currentPrice  Float?
-  modelNumber String
-
   priceHistory Price[]
   users       User[]   @relation("UserItems")
   userItems   UserItem[]
+  storeIds    StoreID[]
 }
 // Join table for many-to-many relationship between User and Item
 model UserItem {
-  userId Int
-  itemId String
+  userId Int 
+  itemId String 
   user   User @relation(fields: [userId], references: [id])
   item   Item @relation(fields: [itemId], references: [id])
   @@id([userId, itemId])  // Composite primary key for uniqueness
@@ -49,6 +46,14 @@ model Price {
   date      DateTime @default(now())
   store     String
   price     Float
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    String
+}
+
+model StoreID {
+  id        String      @id @default(cuid())
+  store     String
+  storeId   String
   item      Item     @relation(fields: [itemId], references: [id])
   itemId    String
 }
