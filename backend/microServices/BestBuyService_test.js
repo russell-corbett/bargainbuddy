@@ -7,3 +7,4 @@ bestBuyService.searchBestBuy().then(productDetails => {
 }).catch(error => {
     console.error('Error:', error);
 });
+
