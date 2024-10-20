@@ -1,5 +1,5 @@
 const express = require("express");
-const trendController = require("../trendController");
+const trendController = require("./trendController");
 
 const router = express.Router();
 
