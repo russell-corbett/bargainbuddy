@@ -1,5 +1,5 @@
-const db = require("../database");
-const { callPlotPriceTrends } = require("../microServices/createTrendPlotWrapper");
+const db = require("../../../database");
+const { callPlotPriceTrends } = require("../../../microServices/createTrendPlotWrapper");
 
 exports.makeTrend = async (req, res) => {
   const itemID = req.body.itemID;
