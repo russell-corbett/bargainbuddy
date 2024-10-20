@@ -11,7 +11,7 @@ model User {
   id       Int @id @default(autoincrement())
   email       String @unique
   username    String @unique
-  token    String
+  password    String
   displayName String?
   avatarUrl   String?
   items    Item[]   @relation("UserItems")

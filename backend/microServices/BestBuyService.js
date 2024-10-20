@@ -3,7 +3,7 @@ const axios = require('axios');
 class BestBuyService {
     constructor() {
         this.apiKey = 'yAXuIGzr8Lnmm4pXN9MX2FQ5';
-        this.modelNumber = '920-003376';
+        // this.modelNumber = '981-001256';
     }
 
     async fetchData(url) {
@@ -16,8 +16,8 @@ class BestBuyService {
         }
     }
 
-    async fetchProductDetails() {
-        const productUrl = `https://api.bestbuy.com/v1/products(modelNumber=${this.modelNumber})?apiKey=${this.apiKey}&format=json`;
+    async fetchProductDetails(mn) {
+        const productUrl = `https://api.bestbuy.com/v1/products(modelNumber=${mn})?apiKey=${this.apiKey}&format=json`;
         const productData = await this.fetchData(productUrl);
 
         if (productData && productData.products && productData.products.length > 0) {
@@ -45,9 +45,9 @@ class BestBuyService {
         }
     }
 
-    async searchBestBuy() {
+    async searchBestBuy(model_number) {
         try {
-            const productDetails = await this.fetchProductDetails();
+            const productDetails = await this.fetchProductDetails(model_number);
             const historicalPrices = await this.fetchHistoricalPrices(productDetails.sku);
             return {
                 ...productDetails,
