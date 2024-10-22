@@ -2,16 +2,31 @@ const axios = require('axios');
 
 class BestBuyService {
     constructor() {
-        this.apiKey = 'yAXuIGzr8Lnmm4pXN9MX2FQ5';
+        this.apiKey = 'yAXuIGzr8Lnmm4pXN9MX2FQ5'; // Ensure this is a valid API key
         this.modelNumber = '920-003376';
     }
 
     async fetchData(url) {
         try {
-            const response = await axios.get(url, { timeout: 10000 });
+            const response = await axios.get(url, {
+                timeout: 10000,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+                }
+            });
             return response.data;
         } catch (error) {
-            console.error('Error fetching data:', error.message);
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error('Error fetching data:', error.response.status, error.response.statusText);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error('Error fetching data: No response received', error.request);
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error fetching data:', error.message);
+            }
             return null;
         }
     }
@@ -33,32 +48,6 @@ class BestBuyService {
             throw new Error('Product information not found');
         }
     }
-
-    async fetchHistoricalPrices(sku) {
-        const historicalPricesUrl = `https://api.bestbuy.com/v1/products/${sku}/priceHistory?apiKey=${this.apiKey}&format=json`;
-        const historicalPricesData = await this.fetchData(historicalPricesUrl);
-
-        if (historicalPricesData && historicalPricesData.priceHistory) {
-            return historicalPricesData.priceHistory;
-        } else {
-            return [];
-        }
-    }
-
-    async searchBestBuy() {
-        try {
-            const productDetails = await this.fetchProductDetails();
-            const historicalPrices = await this.fetchHistoricalPrices(productDetails.sku);
-            return {
-                ...productDetails,
-                historicalPrices: historicalPrices
-            };
-        } catch (error) {
-            console.error('Error in searchBestBuy:', error.message);
-            return { error: error.message };
-        }
-    }
 }
 
 module.exports = BestBuyService;
-
