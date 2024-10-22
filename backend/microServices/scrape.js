@@ -9,7 +9,7 @@ const getPricesFromStore = async (url, itemSelector, selectors) => {
         const $ = cheerio.load(data);
         const results = [];
 
-        // Select product items
+        // Select product items 
         $(itemSelector).each((i, elem) => {
             if (i < 5) { // Limit to 5 items
                 const element = $(elem);

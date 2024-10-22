@@ -1,5 +1,5 @@
 const { searchProduct } = require('./scrape');
-
+ 
 const main = async () => {
     const productName = 'Logitech Pebble Keys 2 K380s Multi-Device Bluetooth Wireless Keyboard';
     const prices = await searchProduct(productName);
