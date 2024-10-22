@@ -25,7 +25,8 @@ model Item {
   modelNumber String @unique
   description String?
   itemImg     String?
-  currentPrice  Float?
+  currentBestPrice  Float?
+  currentStore  String?
   priceHistory Price[]
   users       User[]   @relation("UserItems")
   userItems   UserItem[]

@@ -41,13 +41,12 @@ interface Product {
 	item: {
 		itemImg: string;
 		name: string;
-		price: number;
+		currentPrice: number;
 		modelNumber: string;
 	};
 }
 
 const ProductCard = ({ product }: { product: Product }) => {
-	console.log(product);
 	return (
 		<div className="bg-stone-50 rounded-3xl border-2 border-neutral-200 p-4 relative">
 			<img
@@ -55,9 +54,9 @@ const ProductCard = ({ product }: { product: Product }) => {
 				alt={product.item.name}
 				className="w-full h-72 object-cover rounded-t-3xl"
 			/>
-			<h2 className="text-black text-xl font-semibold mt-4">{product.item.name}</h2> // Product name
-			<p className="text-lime-800 text-xl font-semibold">${product.item.price}</p> // Product price
-			<p className="text-gray-600">SKU: {product.item.modelNumber}</p> // SKU information
+			<h2 className="text-black text-xl font-semibold mt-4">{product.item.name}</h2>
+			<p className="text-lime-800 text-xl font-semibold">${product.item.currentPrice}</p>
+			<p className="text-gray-600">Model Number: {product.item.modelNumber}</p>
 		</div>
 	);
 };

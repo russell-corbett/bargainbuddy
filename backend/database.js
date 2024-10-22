@@ -6,7 +6,6 @@ class Database {
   }
 
   async getRecord(model, where) {
-    console.log(model, where);
     try {
       return await this.prisma[model].findFirst({
         where: where,

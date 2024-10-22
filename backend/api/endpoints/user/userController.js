@@ -91,6 +91,7 @@ exports.connectUserItem = async (req, res) => {
 		res.status(500).json({ error: "Error creating record" });
 	}
 };
+
 exports.disconnectUserItem = async (req, res) => {
 	const email = req.body.email;
 	const user = await db.getRecord("User", { email });
