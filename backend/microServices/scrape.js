@@ -2,7 +2,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 
 const getPricesFromStore = async (url, itemSelector, selectors) => {
-    try {
+    try { 
         const { data } = await axios.get(url, {
             headers: { 'User-Agent': 'Mozilla/5.0' }
         });
