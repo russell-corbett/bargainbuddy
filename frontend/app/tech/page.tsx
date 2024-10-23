@@ -41,7 +41,7 @@ interface Product {
 	item: {
 		itemImg: string;
 		name: string;
-		currentPrice: number;
+		currentBestPrice: number;
 		modelNumber: string;
 	};
 }
@@ -61,7 +61,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 		</h2>
 		{/* Price */}
 		<p className="absolute left-6 top-[350px] text-lime-800 text-xl font-semibold font-['Inter'] leading-relaxed">
-		  ${product.item.currentPrice}
+		  ${product.item.currentBestPrice}
 		</p>
 		{/* Model Number */}
 		<p className="absolute left-6 top-[392px] text-neutral-500 text-base font-normal font-['Inter'] leading-normal">

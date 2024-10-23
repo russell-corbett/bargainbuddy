@@ -63,7 +63,7 @@ class BestBuyService {
 			const item_body = {
 				name: productDetails.name,
 				modelNumber: model_number,
-				currentPrice: productDetails.price,
+				currentBestPrice: productDetails.price,
 				itemImg: productDetails.productPicture,
 			};
 
