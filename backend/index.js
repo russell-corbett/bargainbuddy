@@ -13,10 +13,10 @@ const app = express();
 const port = 3001;
 const server = http.createServer(app);
 const io = socketIO(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+	cors: {
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST"],
+	},
 });
 
 const db = Database;
@@ -34,34 +34,34 @@ app.use(trendRoutes);
 
 // Close the database connection on server shutdown
 process.on("SIGINT", async () => {
-  await db.close();
-  server.close(() => {
-    console.log("Server closed");
-    process.exit(0);
-  });
+	await db.close();
+	server.close(() => {
+		console.log("Server closed");
+		process.exit(0);
+	});
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+	res.send("Hello World!");
 });
 
 io.on("connection", (socket) => {
-  console.log(`New client connected ${socket.id}`);
+	console.log(`New client connected ${socket.id}`);
 
-  socket.on("disconnect", () => {
-    console.log(`Client has disconnected ${socket.id}`);
-  });
+	socket.on("disconnect", () => {
+		console.log(`Client has disconnected ${socket.id}`);
+	});
 
-  socket.on("addToWishlist", (data) => {
-    // console.log(data.modelNumber);
-    bestBuyApiRef.searchBestBuy(data.modelNumber);
-  });
+	socket.on("addToWishlist", (data) => {
+		// console.log(data.modelNumber);
+		bestBuyApiRef.searchBestBuy(data.modelNumber);
+	});
 
-  socket.on("modelNumber", (data) => {
-    console.log("ModelNumber event");
-  });
+	socket.on("modelNumber", (data) => {
+		console.log("ModelNumber event");
+	});
 });
 
 server.listen(port, () => {
-  console.log("Server is listening.");
+	console.log("Server is listening.");
 });

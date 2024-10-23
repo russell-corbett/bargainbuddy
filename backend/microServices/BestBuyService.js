@@ -77,20 +77,6 @@ class BestBuyService {
 
 			// Connect the user to the item
 			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
-
-			// Log the required details to the console
-			// console.log(`Item Name: ${productDetails.name}`);
-			// console.log(`Price: $${productDetails.price}`);
-			// console.log(`Store Name: Best Buy`);
-			// console.log(`Image URL: ${productDetails.productPicture}`);
-
-			//   const historicalPrices = await this.fetchHistoricalPrices(
-			//     productDetails.sku
-			//   );
-			//   return {
-			//     ...productDetails,
-			//     historicalPrices: historicalPrices,
-			//   };
 		} catch (error) {
 			console.error("Error in searchBestBuy:", error.message);
 			return { error: error.message };
