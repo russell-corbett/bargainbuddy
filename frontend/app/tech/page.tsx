@@ -22,8 +22,8 @@ export default function TechPage() {
 	}, []);
 
 	return (
-		<div className="min-h-screen p-8">
-			<h1 className="text-6xl mt-12">Tech Products</h1>
+		<div className="min-h-screen p-8 bg-white">
+			<h1 className="bg-white text-black dark:text-black text-6xl mt-12 font-['Newsreader']">Tech Products</h1>
 			{products.length > 0 ? (
 				<div className="grid grid-cols-3 gap-8 mt-12">
 					{products.map((product, index) => (
@@ -31,7 +31,7 @@ export default function TechPage() {
 					))}
 				</div>
 			) : (
-				<p>No products found. Please submit a product link.</p>
+				<p className="text-black dark:text-black">No products found. Please submit a product link.</p>
 			)}
 		</div>
 	);
@@ -48,15 +48,26 @@ interface Product {
 
 const ProductCard = ({ product }: { product: Product }) => {
 	return (
-		<div className="bg-stone-50 rounded-3xl border-2 border-neutral-200 p-4 relative">
-			<img
-				src={product.item.itemImg} // Display product image
-				alt={product.item.name}
-				className="w-full h-72 object-cover rounded-t-3xl"
-			/>
-			<h2 className="text-black text-xl font-semibold mt-4">{product.item.name}</h2>
-			<p className="text-lime-800 text-xl font-semibold">${product.item.currentBestPrice}</p>
-			<p className="text-gray-600">Model Number: {product.item.modelNumber}</p>
-		</div>
+	  <div className="w-96 h-96 relative bg-stone-50 rounded-3xl border-2 border-neutral-200">
+		{/* Product Image */}
+		<img
+		  src={product.item.itemImg}
+		  alt={product.item.name}
+		  className="w-96 h-72 object-cover rounded-t-3xl absolute top-0 left-0"
+		/>
+		{/* Product Name */}
+		<h2 className="absolute left-6 top-[320px] text-black text-xl font-semibold font-['Inter'] leading-relaxed">
+		  {product.item.name}
+		</h2>
+		{/* Price */}
+		<p className="absolute left-6 top-[350px] text-lime-800 text-xl font-semibold font-['Inter'] leading-relaxed">
+		  ${product.item.currentBestPrice}
+		</p>
+		{/* Model Number */}
+		<p className="absolute left-6 top-[392px] text-neutral-500 text-base font-normal font-['Inter'] leading-normal">
+		  Model Number: {product.item.modelNumber}
+		</p>
+	  </div>
 	);
-};
+  };
+  
