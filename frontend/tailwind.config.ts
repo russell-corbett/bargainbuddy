@@ -12,8 +12,18 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        dynapuff: ['Dynapuff', 'cursive'],
+      },
+      perspective:{
+        '1000': '1000px',
+      },
+      rotate:{
+        'y-180': 'rotateY(180deg)',
+      },
     },
   },
   plugins: [],
 };
+
 export default config;
