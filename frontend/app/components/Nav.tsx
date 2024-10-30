@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { io } from "socket.io-client";
+import { getSocket } from "../socket";
 
-const socket = io("http://localhost:3001");
+const socket = getSocket();
 
 export default function Nav() {
   const [modelNumber, setModelNumber] = useState("");
@@ -16,6 +16,8 @@ export default function Nav() {
 
     setModelNumber("");
     setIsSearchOpen(false);
+
+    console.log("Mounted");
   };
 
   const handleSearchToggle = () => setIsSearchOpen(!isSearchOpen);
