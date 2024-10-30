@@ -1,8 +1,13 @@
+"use client"
+
 import { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../../firebaseConfig.js'
+import { admin } from '../../../firebaseAdmin.js'
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
+    const [userName, setUser] = useState('')
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -20,13 +25,25 @@ const RegisterPage = () => {
       }
   
       try {
-        const auth = getAuth();
+        //const auth = getAuth();
         // Register the user with Firebase
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const token = await userCredential.user.getIdToken();
-  
+        const decodedToken = await admin.auth().verifyIdToken(token)
+
+        const response = await axios.post(
+          "http://localhost:3001/createUser",
+          {
+            email: decodedToken.email,
+            password: password,
+            userName: userName 
+            //Token: token
+          }
+        );
+
+        /*
         // Optionally send the token to your backend to create a user record
-        const response = await fetch('/api/register-user', {
+        const response = await fetch('../../backend/api/login/register-user', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -34,6 +51,7 @@ const RegisterPage = () => {
           },
           body: JSON.stringify({ email }),
         });
+        */
   
         if (!response.ok) {
           throw new Error('Failed to register user in backend');
@@ -64,6 +82,13 @@ const RegisterPage = () => {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type = "username"
+          placeholder = "Username"
+          value = {userName}
+          onChange ={(e) => setUser(e.target.value)}
           required
         />
         <input

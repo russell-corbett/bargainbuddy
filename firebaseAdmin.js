@@ -11,6 +11,4 @@ if (!admin.apps.length) {
   });
 }
 
-const db = admin.firestore(); // If you're using Firestore
-
-export { admin, db };
+export { admin };
