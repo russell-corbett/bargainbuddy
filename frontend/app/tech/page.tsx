@@ -9,23 +9,25 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function TechPage() {
-	const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
-	useEffect(() => {
-		const fetchProducts = async () => {
-			try {
-				const response = await axios.post("http://localhost:3001/getUserItems", {
-					email: "zrcoffey@mun.ca",
-				});
-				setProducts(response.data);
-			} catch (error) {
-				console.error("Error fetching products:", error);
-			}
-		};
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3001/getUserItems",
+          {
+            email: "zrcoffey@mun.ca",
+          }
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
 
-		fetchProducts();
-	}, []);
-
+    fetchProducts();
+  }, []);
 	return (
 		<div className="min-h-screen p-8 bg-white ">
 			<h1 className="bg-white text-black dark:text-black text-4xl mt-1 font-serif border-b border-gray-200	 pb-6 ">Technology</h1>
@@ -99,5 +101,4 @@ const ProductCard = ({ product }: { product: Product }) => {
 	  </div>
 	);
   };
-  
   

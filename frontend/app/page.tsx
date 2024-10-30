@@ -1,16 +1,14 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { socket } from './socket';
+import { useEffect, useState } from "react";
+import { getSocket } from "./socket";
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [transport, setTransport] = useState<string>("N/A");
-  const [modelNumber, setModelNumber] = useState<number>(0);
+  // const [modelNumber, setModelNumber] = useState<number>(0);
 
   useEffect(() => {
-    if (socket.connected) {
-      onConnect();
-    }
+    const socket = getSocket();
 
     function onConnect() {
       setIsConnected(true);
@@ -19,9 +17,9 @@ export default function Home() {
         setTransport(transport.name);
       });
 
-      socket.emit("modelNumber", (data: number) => {
-        setModelNumber(data);
-      });
+      // socket.emit("modelNumber", (data: number) => {
+      //   setModelNumber(data);
+      // });
     }
 
     function onDisconnect() {
@@ -32,10 +30,10 @@ export default function Home() {
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
 
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-    };
+    // return () => {
+    //   socket.off("connect", onConnect);
+    //   socket.off("disconnect", onDisconnect);
+    // };
   }, []);
 
   return (
@@ -43,7 +41,7 @@ export default function Home() {
       <h1 className="text-4xl font-semibold">Bargain Buddy</h1>
       <p>Status: {isConnected ? "Connected" : "Disconnected"}</p>
       <p>Transport: {transport}</p>
-      <p>Model Number: {modelNumber}</p>
+      {/* <p>Model Number: {modelNumber}</p> */}
     </div>
   );
 }

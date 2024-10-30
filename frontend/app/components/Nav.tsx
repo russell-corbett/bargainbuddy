@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { getSocket } from "../socket";
 import { io } from "socket.io-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,7 +12,7 @@ import {
   faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 
-const socket = io("http://localhost:3001");
+const socket = getSocket();
 
 export default function Nav() {
   const [modelNumber, setModelNumber] = useState("");
@@ -31,6 +32,8 @@ export default function Nav() {
 
     setModelNumber("");
     setIsSearchOpen(false);
+
+    console.log("Mounted");
   };
 
   const handleSearchToggle = () => setIsSearchOpen(!isSearchOpen);
