@@ -7,7 +7,7 @@ const userRoutes = require("./api/endpoints/user/userRoutes");
 const itemRoutes = require("./api/endpoints/item/itemRoutes");
 const priceRoutes = require("./api/endpoints/price/priceRoutes");
 const trendRoutes = require("./api/endpoints/trend/trendRoutes");
-const bestBuyApi = require("../backend//microServices//BestBuyService");
+const BestBuyService = require("./microServices/BestBuyService"); // Corrected path
 
 const app = express();
 const port = 3001;
@@ -23,7 +23,7 @@ let clientsConnected = 0;
 
 const db = Database;
 
-const bestBuyApiRef = new bestBuyApi();
+const bestBuyApiRef = new BestBuyService();
 
 // Enable CORS for all routes
 app.use(cors());
