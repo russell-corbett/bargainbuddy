@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getSocket } from "./socket";
+import LandingPage from './home/page';
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -37,11 +38,17 @@ export default function Home() {
   }, []);
 
   return (
+    <div>
+    {/* Landing Page Section */}
+    <LandingPage />
+
+    {/* Socket Status Section */}
     <div className="p-8">
       <h1 className="text-4xl font-semibold">Bargain Buddy</h1>
       <p>Status: {isConnected ? "Connected" : "Disconnected"}</p>
       <p>Transport: {transport}</p>
       {/* <p>Model Number: {modelNumber}</p> */}
     </div>
-  );
+  </div>
+);
 }
