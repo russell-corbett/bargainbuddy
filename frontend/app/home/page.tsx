@@ -11,6 +11,9 @@ import {
   faCartShopping,
   faHandHoldingDollar,
   faBell,
+  faBars,
+  faCircleQuestion,
+  faDollarSign,
 } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import compareImage from "../storeLogos/comparePrice.jpg";
@@ -25,6 +28,13 @@ export default function LandingPage() {
     });
   }, []);
 
+// **Dropdown state and toggle function**
+const [isOpen, setIsOpen] = useState(false);
+
+const toggleDropdown = () => {
+  setIsOpen(!isOpen);
+};
+
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* Navbar */}
@@ -32,23 +42,47 @@ export default function LandingPage() {
         className="flex justify-between items-center p-6 bg-white text-lime-800"
         data-aos="fade-down"
       >
-        {/* Left side links */}
-        <div className="flex space-x-6">
-          <a href="#how-it-works" className="hover:underline">
-            How it Works
-          </a>
-          <a href="#pricing" className="hover:underline">
-            Pricing
-          </a>
+        {/* Left side with dropdown menu */}
+        <div className="relative">
+          {/* Menu Icon */}
+          <button
+            onClick={toggleDropdown}
+            className="flex items-center p-2 text-2xl text-green-800 hover:text-lime-700 focus:outline-none"
+          >
+            <FontAwesomeIcon icon={faBars} />
+          </button>
+
+          {/* Dropdown Items */}
+          {isOpen && (
+            <div className="absolute mt-2 w-48 bg-white rounded-lg shadow-lg z-10">
+              <a
+                href="#how-it-works"
+                className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                <FontAwesomeIcon
+                  icon={faCircleQuestion}
+                  className="mr-2 text-lime-800"
+                />
+                How it Works
+              </a>
+              <a
+                href="#pricing"
+                className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+              >
+                <FontAwesomeIcon
+                  icon={faDollarSign}
+                  className="mr-2 text-lime-800"
+                />
+                Pricing
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Right side links */}
         <div className="flex space-x-6">
-          {/* <button className="bg-white text-lime-800 py-2 px-4 rounded-lg hover:bg-gray-200">
-            Register
-          </button> */}
           <Link href="/accountSignIn">
-            <button className="bg-lime-800 text-white py-2 px-4 rounded-lg hover:scale-105">
+            <button className="border-2 border-lime-800 bg-white text-lime-800 py-2 px-4 rounded-2xl hover:bg-lime-800 hover:text-white">
               Sign In
             </button>
           </Link>
