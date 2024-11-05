@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AOS from "aos";
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLink,
@@ -43,12 +44,14 @@ export default function LandingPage() {
 
         {/* Right side links */}
         <div className="flex space-x-6">
-          <button className="bg-white text-lime-800 py-2 px-4 rounded-lg hover:bg-gray-200">
+          {/* <button className="bg-white text-lime-800 py-2 px-4 rounded-lg hover:bg-gray-200">
             Register
-          </button>
-          <button className="bg-lime-800 text-white py-2 px-4 rounded-lg hover:scale-105">
-            Sign In
-          </button>
+          </button> */}
+          <Link href="/accountSignIn">
+            <button className="bg-lime-800 text-white py-2 px-4 rounded-lg hover:scale-105">
+              Sign In
+            </button>
+          </Link>
         </div>
       </nav>
 
