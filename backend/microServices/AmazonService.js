@@ -1,68 +1,76 @@
+// services/AmazonService.js
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const AmazonService = async (productName) => {
+class AmazonService {
+  constructor() {
+    // Initialization if needed
+  }
+
+  async searchAmazon(productName) {
     const url = `https://www.amazon.ca/s?k=${encodeURIComponent(productName)}`;
-    const itemSelector = '.s-result-item';
+    const itemSelector = '.s-search-results .s-result-item';
     const selectors = {
-        name: 'h2.a-size-mini a.a-link-normal span.a-text-normal',
-        price: '.a-price .a-offscreen',
-        link: 'h2.a-size-mini a.a-link-normal',
-        image: '.s-image'
+      name: 'h2.a-size-mini a.a-link-normal span.a-text-normal, h2.a-size-mini a.a-link-normal span',
+      price: '.a-price .a-offscreen',
+      link: 'h2.a-size-mini a.a-link-normal',
+      image: '.s-image',
     };
 
     try {
-        const { data } = await axios.get(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
-        });
-        const $ = cheerio.load(data);
-        let bestItem = null;
-        let bestScore = 0;
+      const { data } = await axios.get(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0' },
+      });
+      const $ = cheerio.load(data);
+      let bestItem = null;
+      let bestScore = 0;
 
-        $(itemSelector).each((i, elem) => {
-            const element = $(elem);
-            const name = element.find(selectors.name).text().trim() || null;
-            let price = element.find(selectors.price).first().text().trim() || null;
-            let link = element.find(selectors.link).attr('href') || null;
-            const image = element.find(selectors.image).attr('src') || null;
+      $(itemSelector).each((i, elem) => {
+        const element = $(elem);
+        const name = element.find(selectors.name).text().trim() || null;
+        let price = element.find(selectors.price).first().text().trim() || null;
+        let link = element.find(selectors.link).attr('href') || null;
+        const image = element.find(selectors.image).attr('src') || null;
 
-            if (link && !link.startsWith('http')) {
-                const baseUrl = new URL(url).origin;
-                link = baseUrl + link;
-            }
+        if (!name || !link) {
+          // Skip items without name or link
+          return;
+        }
 
-            // Ensure only one price is selected
-            if (price) {
-                const priceParts = price.split('$');
-                price = priceParts.length > 1 ? `$${priceParts[1].trim()}` : price;
-            }
+        if (link && !link.startsWith('http')) {
+          const baseUrl = new URL(url).origin;
+          link = baseUrl + link;
+        }
 
-            const score = [name, price, link, image].filter(Boolean).length;
+        // Extract ASIN (Amazon Standard Identification Number) from the link
+        let id = null;
+        const asinMatch = link.match(/\/(dp|gp)\/([A-Z0-9]{10})/);
+        if (asinMatch) {
+          id = asinMatch[2];
+        }
 
-            if (score > bestScore) {
-                bestItem = { name, price, link, image };
-                bestScore = score;
-            }
+        // Clean up the price and convert to a number
+        if (price) {
+          price = price.replace(/[^0-9.,]/g, '').replace(',', '.');
+          price = parseFloat(price);
+        }
 
-            if (score === 4) return false; // exit loop early if perfect match
-        });
+        const score = [name, price, link, image, id].filter(Boolean).length;
 
-        return bestItem;
+        if (score > bestScore) {
+          bestItem = { name, price, link, image, id, modelNumber: null };
+          bestScore = score;
+        }
+
+        if (score === 5) return false; // exit loop early if perfect match
+      });
+
+      return bestItem;
     } catch (error) {
-        console.error(`Error fetching data from ${url}:`, error.message);
-        return null;
+      console.error(`Error fetching data from Amazon:`, error.message);
+      return null;
     }
-};
+  }
+}
 
-const productName = process.argv[2] || 'Mens Extended Sizes Jersey Knit Sleep Pajama Lounge Pant (1 & 2 Packs) Pajama Bottom';
-AmazonService(productName).then(item => {
-    if (!item) {
-        console.log('No results found.');
-    } else {
-        console.log(`\nPrices for "${productName}" from Amazon Canada:\n`);
-        console.log(`Name: ${item.name}`);
-        console.log(`Price: ${item.price}`);
-        console.log(`Link: ${item.link}`);
-        console.log(`Image: ${item.image}`);
-    }
-});
+module.exports = AmazonService;
