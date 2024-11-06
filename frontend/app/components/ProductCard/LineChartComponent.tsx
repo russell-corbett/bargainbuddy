@@ -18,11 +18,12 @@ interface DataPoint {
 
 const mockData: DataPoint[] = [
   { month: "Jan", price: 100 },
-  { month: "Feb", price: 105 },
-  { month: "Mar", price: 102 },
-  { month: "Apr", price: 110 },
-  { month: "May", price: 108 },
-  { month: "Jun", price: 115 },
+  { month: "Feb", price: 101 },
+  { month: "Mar", price: 200 },
+  { month: "Apr", price: 160 },
+  { month: "May", price: 90 },
+  { month: "Jun", price: 1500 },
+  
 ];
 
 const LineChartComponent: React.FC = () => {

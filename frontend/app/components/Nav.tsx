@@ -35,7 +35,9 @@ export default function Nav() {
   const handleSearchButtonClick = () => {
     if (isSearchOpen) {
       // If search bar is open, submit the form
-      (document.getElementById("searchForm") as HTMLFormElement)?.requestSubmit();
+      (
+        document.getElementById("searchForm") as HTMLFormElement
+      )?.requestSubmit();
     } else {
       // If search bar is closed, open it
       setIsSearchOpen(true);
