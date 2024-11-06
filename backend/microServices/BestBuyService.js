@@ -66,7 +66,7 @@ class BestBuyService {
   }
 
   async fetchProductByName(productName) {
-    const url = `https://api.bestbuy.com/v1/products((search=${encodeURIComponent(productName)}))?apiKey=${this.apiKey}&sort=name.asc&show=sku,name,salePrice,image,url,modelNumber&format=json`;
+    const url = `https://api.bestbuy.com/v1/products((search=${encodeURIComponent(productName)}))?apiKey=${this.apiKey}&sort=name.asc&show=sku,name,salePrice,image,url,modelNumber,upc&format=json`;
     const data = await this.fetchData(url);
 
     if (data && data.products && data.products.length > 0) {
@@ -84,7 +84,7 @@ class BestBuyService {
       link: product.url || null,
       image: product.image || null,
       modelNumber: product.modelNumber || null,
-      id: product.sku ? product.sku.toString() : null,
+      upc: product.upc || null, // Added UPC field
     };
   }
 }

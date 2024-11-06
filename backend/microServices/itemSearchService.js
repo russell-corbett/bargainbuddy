@@ -23,22 +23,17 @@ class ItemSearchService {
         return { message: 'No products found' };
       }
 
-      // Get or create user
-      let user = await this.prisma.user.findUnique({ where: { email } });
+      // Get user
+      const user = await this.prisma.user.findUnique({ where: { email } });
 
-      // if (!user) {
-      //   user = await this.prisma.user.create({
-      //     data: {
-      //       email,
-      //       username: email,
-      //       password: 'password', // Replace with secure password handling
-      //     },
-      //   });
-      // }
+      if (!user) {
+        return { message: 'User not found' };
+      }
 
       for (const result of results) {
-        const { store, name, price, link, image, modelNumber, id } = result;
-        const uniqueId = modelNumber || id || name;
+        const { store, name, price, link, image, modelNumber, upc } = result;
+
+        const uniqueId = modelNumber || upc || name;
 
         // Find or create the item
         let item = await this.prisma.item.findUnique({
@@ -60,7 +55,7 @@ class ItemSearchService {
                 create: [{ price: parseFloat(price), date: new Date(), store }],
               },
               storeIds: {
-                create: [{ store, storeId: id }],
+                create: [{ store, storeId: upc }],
               },
             },
           });
@@ -112,7 +107,7 @@ class ItemSearchService {
     let bestBuyResult = null;
     let walmartResult = null;
 
-    // Use the specified search type for BestBuy
+    // Try to get product name from BestBuy
     bestBuyResult = await this.bestBuyService.searchBestBuy(query, searchType);
     if (bestBuyResult && bestBuyResult.name) {
       productName = bestBuyResult.name;
@@ -120,7 +115,7 @@ class ItemSearchService {
 
     // If no product name from BestBuy, try Walmart
     if (!productName) {
-      walmartResult = await this.walmartService.searchWalmart(query, searchType);
+      walmartResult = await this.walmartService.searchWalmart(query);
       if (walmartResult && walmartResult.name) {
         productName = walmartResult.name;
       }
