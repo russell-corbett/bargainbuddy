@@ -20,18 +20,21 @@ model User {
   updatedAt   DateTime @updatedAt
 }
 model Item {
-  id          String    @id @default(cuid())
-  name        String
-  modelNumber String @unique
-  description String?
-  itemImg     String?
+  id                String     @id @default(cuid())
+  uniqueId          String     @unique
+  name              String
+  modelNumber       String?
+  description       String?
+  itemImg           String?
   currentBestPrice  Float?
-  currentStore  String?
-  priceHistory Price[]
-  users       User[]   @relation("UserItems")
-  userItems   UserItem[]
-  storeIds    StoreID[]
+  currentStore      String?
+  link              String?
+  priceHistory      Price[]
+  users             User[]     @relation("UserItems")
+  userItems         UserItem[]
+  storeIds          StoreID[]
 }
+
 // Join table for many-to-many relationship between User and Item
 model UserItem {
   userId Int 

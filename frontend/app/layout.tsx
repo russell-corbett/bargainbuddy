@@ -9,7 +9,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname(); // Get the current path
 
   // Render the Nav for all routes except for the root ('/')
-  const showGlobalNav = pathname !== '/' && pathname != '/home';
+  const showGlobalNav = pathname !== '/' && pathname != '/home' && pathname != '/accountSignIn';
 
 
   return (
