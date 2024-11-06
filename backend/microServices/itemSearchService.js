@@ -26,15 +26,15 @@ class ItemSearchService {
       // Get or create user
       let user = await this.prisma.user.findUnique({ where: { email } });
 
-      if (!user) {
-        user = await this.prisma.user.create({
-          data: {
-            email,
-            username: email,
-            password: 'password', // Replace with secure password handling
-          },
-        });
-      }
+      // if (!user) {
+      //   user = await this.prisma.user.create({
+      //     data: {
+      //       email,
+      //       username: email,
+      //       password: 'password', // Replace with secure password handling
+      //     },
+      //   });
+      // }
 
       for (const result of results) {
         const { store, name, price, link, image, modelNumber, id } = result;
