@@ -1,76 +1,151 @@
-const { PrismaClient } = require("@prisma/client");
-const AmazonService = require("./AmazonService.js");
-const BestBuyService = require("./BestBuyService.js");
-const WalmartService = require("./WalmartService.js");
-
-// console.log("Running");
+// ItemSearchService.js
+const { PrismaClient } = require('@prisma/client');
+const AmazonService = require('./AmazonService.js');
+const BestBuyService = require('./BestBuyService.js');
+const WalmartService = require('./WalmartService.js');
+const EbayService = require('./EbayService.js');
 
 class ItemSearchService {
-	constructor() {
-		this.amazonService = new AmazonService();
-		this.bestBuyService = new BestBuyService();
-		this.walmartService = new WalmartService();
+  constructor() {
+    this.amazonService = new AmazonService();
+    this.bestBuyService = new BestBuyService();
+    this.walmartService = new WalmartService();
+    this.ebayService = new EbayService();
+    this.prisma = new PrismaClient();
+    console.log('Item search service constructed');
+  }
 
-		this.prisma = new PrismaClient();
+  async searchAndStoreItem(query, email, searchType) {
+    try {
+      const results = await this.searchProduct(query, searchType);
 
-		console.log("Item search service constructed");
-	}
+      if (results.length === 0) {
+        return { message: 'No products found' };
+      }
 
-	async searchAndStoreItem(query) {
-		try {
-			const amazonResult = await this.amazonService.searchAmazon(query);
-			const bestBuyResult = await this.bestBuyService.searchBestBuy(query);
-			const walmartResult = await this.walmartService.searchWalmart(query);
+      // Get or create user
+      let user = await this.prisma.user.findUnique({ where: { email } });
 
-			const results = [
-				{ store: "Amazon", ...amazonResult },
-				{ store: "BestBuy", ...bestBuyResult },
-				{ store: "Walmart", ...walmartResult },
-			];
+      if (!user) {
+        user = await this.prisma.user.create({
+          data: {
+            email,
+            username: email,
+            password: 'password', // Replace with secure password handling
+          },
+        });
+      }
 
-			for (const result of results) {
-				const { store, title, price, id } = result;
+      for (const result of results) {
+        const { store, name, price, link, image, modelNumber, id } = result;
+        const uniqueId = modelNumber || id || name;
 
-				let item = await this.prisma.item.findFirst({
-					where: {
-						OR: [{ amazonId: id }, { bestBuyId: id }, { walmartId: id }],
-					},
-				});
+        // Find or create the item
+        let item = await this.prisma.item.findUnique({
+          where: { uniqueId },
+        });
 
-				if (item) {
-					await this.prisma.price.create({
-						data: {
-							price,
-							store,
-							itemId: item.id,
-						},
-					});
-				} else {
-					item = await this.prisma.item.create({
-						data: {
-							name: title,
-							amazonId: store === "Amazon" ? id : null,
-							bestBuyId: store === "BestBuy" ? id : null,
-							walmartId: store === "Walmart" ? id : null,
-							priceHistory: {
-								create: {
-									price: 19.99,
-									date: new Date(),
-									store: "Walmart",
-								},
-							},
-							currentPrice: 19.99,
-						},
-					});
-				}
-			}
+        if (!item) {
+          item = await this.prisma.item.create({
+            data: {
+              uniqueId,
+              name,
+              modelNumber: modelNumber || null,
+              description: null,
+              itemImg: image,
+              currentBestPrice: parseFloat(price),
+              currentStore: store,
+              link,
+              priceHistory: {
+                create: [{ price: parseFloat(price), date: new Date(), store }],
+              },
+              storeIds: {
+                create: [{ store, storeId: id }],
+              },
+            },
+          });
+        } else {
+          // Update item price if necessary
+          if (parseFloat(price) < item.currentBestPrice) {
+            await this.prisma.item.update({
+              where: { id: item.id },
+              data: {
+                currentBestPrice: parseFloat(price),
+                currentStore: store,
+              },
+            });
+          }
 
-			return { message: "Item prices updated successfully" };
-		} catch (error) {
-			console.error("Error searching and storing item:", error);
-			throw new Error(`Error searching and storing item: ${error.message}`);
-		}
-	}
+          // Add to price history
+          await this.prisma.price.create({
+            data: {
+              price: parseFloat(price),
+              date: new Date(),
+              store,
+              itemId: item.id,
+            },
+          });
+        }
+
+        // Associate the item with the user
+        await this.prisma.userItem.upsert({
+          where: {
+            userId_itemId: { userId: user.id, itemId: item.id },
+          },
+          update: {},
+          create: {
+            userId: user.id,
+            itemId: item.id,
+          },
+        });
+      }
+
+      return { message: 'Item prices updated successfully' };
+    } catch (error) {
+      console.error('Error searching and storing item:', error);
+      throw new Error(`Error searching and storing item: ${error.message}`);
+    }
+  }
+
+  async searchProduct(query, searchType) {
+    let productName = null;
+    let bestBuyResult = null;
+    let walmartResult = null;
+
+    // Use the specified search type for BestBuy
+    bestBuyResult = await this.bestBuyService.searchBestBuy(query, searchType);
+    if (bestBuyResult && bestBuyResult.name) {
+      productName = bestBuyResult.name;
+    }
+
+    // If no product name from BestBuy, try Walmart
+    if (!productName) {
+      walmartResult = await this.walmartService.searchWalmart(query, searchType);
+      if (walmartResult && walmartResult.name) {
+        productName = walmartResult.name;
+      }
+    }
+
+    // If still no product name, assume query is a product name
+    if (!productName) {
+      productName = query;
+    }
+
+    // Search Amazon and eBay using the product name
+    const [amazonResult, ebayResult] = await Promise.all([
+      this.amazonService.searchAmazon(productName),
+      this.ebayService.searchEbay(productName),
+    ]);
+
+    const results = [];
+
+    if (bestBuyResult) results.push({ store: 'BestBuy', ...bestBuyResult });
+    if (walmartResult) results.push({ store: 'Walmart', ...walmartResult });
+    if (amazonResult) results.push({ store: 'Amazon', ...amazonResult });
+    if (ebayResult) results.push({ store: 'eBay', ...ebayResult });
+
+    return results;
+  }
 }
 
 module.exports = ItemSearchService;

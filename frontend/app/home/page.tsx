@@ -3,12 +3,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AOS from "aos";
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPlus,
-  faChartLine,
+  faLink,
   faSearch,
   faCartShopping,
+  faHandHoldingDollar,
+  faBell,
 } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import compareImage from "../storeLogos/comparePrice.jpg";
@@ -26,22 +28,30 @@ export default function LandingPage() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="flex justify-between items-center p-6 bg-white text-lime-800" data-aos="fade-down">
-        <h1 className="text-3xl font-serif "></h1>
-        <div className="space-x-6">
-          <a href="#features" className="hover:underline">
-            Features
-          </a>
+      <nav
+        className="flex justify-between items-center p-6 bg-white text-lime-800"
+        data-aos="fade-down"
+      >
+        {/* Left side links */}
+        <div className="flex space-x-6">
           <a href="#how-it-works" className="hover:underline">
             How it Works
           </a>
           <a href="#pricing" className="hover:underline">
             Pricing
           </a>
+        </div>
 
-          <button className="bg-white text-lime-800 py-2 px-4 rounded-lg hover:bg-gray-200">
-            Sign in
-          </button>
+        {/* Right side links */}
+        <div className="flex space-x-6">
+          {/* <button className="bg-white text-lime-800 py-2 px-4 rounded-lg hover:bg-gray-200">
+            Register
+          </button> */}
+          <Link href="/accountSignIn">
+            <button className="bg-lime-800 text-white py-2 px-4 rounded-lg hover:scale-105">
+              Sign In
+            </button>
+          </Link>
         </div>
       </nav>
 
@@ -52,7 +62,12 @@ export default function LandingPage() {
             icon={faCartShopping}
             className="text-lime-800 text-5xl"
           />
-          <h1 className="text-4xl  text-lime-800 font-serif" data-aos="fade-left" >Bargain Buddy</h1>
+          <h1
+            className="text-4xl  text-lime-800 font-serif"
+            data-aos="fade-left"
+          >
+            Bargain Buddy
+          </h1>
         </div>
 
         {/* Search Bar */}
@@ -69,7 +84,7 @@ export default function LandingPage() {
           </div> */}
 
           <div className="flex text-black justify-center font-serif font-bold font-s mt-6 typing-placeholder duration-300">
-            Compare top store pirces
+            Compare top store prices
           </div>
 
           {/* Store Icons Section */}
@@ -192,7 +207,10 @@ export default function LandingPage() {
       </section>
       <section className="py-16 px-8 bg-gray-50">
         {/* Title */}
-        <h2 className="font-serif text-center text-4xl font-bold text-lime-800 mb-12" data-aos="fade-left">
+        <h2
+          className="font-serif text-center text-4xl font-bold text-lime-800 mb-12"
+          data-aos="fade-left"
+        >
           Why Bargain Buddy?
         </h2>
 
@@ -262,28 +280,62 @@ export default function LandingPage() {
 
       {/* How it Works Section */}
       <section id="how-it-works" className="p-10 bg-stone-100 text-center">
-        <h3 className="text-4xl font-serif text-lime-800">How It Works</h3>
-        <div className="mt-8 max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h4 className="text-xl font-semibold text-lime-800">Step 1</h4>
-              <p className="text-gray-600 mt-2">
-                Paste a product link from any store to start the comparison.
-              </p>
+        <h3 className="text-4xl font-serif text-lime-800 mb-6">How It Works</h3>
+        <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-10">
+          Discover how BargainBuddy helps you save with our simple three-step
+          process.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {/* Step 1 */}
+          <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
+            <div className="flex items-center space-x-4 mb-4">
+              <FontAwesomeIcon
+                icon={faLink}
+                className="text-lime-800 text-5xl"
+              />
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h4 className="text-xl font-semibold text-lime-800">Step 2</h4>
-              <p className="text-gray-600 mt-2">
-                Compare prices and view price history trends.
-              </p>
+            <h4 className="text-xl font-semibold text-lime-800 mb-2">Step 1</h4>
+            <p className="text-gray-600 mb-4">
+              Paste a product link from any store to start the comparison.
+            </p>
+            <a href="#step1-details" className="text-lime-800 font-medium">
+              Learn More &rarr;
+            </a>
+          </div>
+
+          {/* Step 2 */}
+          <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
+            <div className="flex items-center space-x-4 mb-4">
+              <FontAwesomeIcon
+                icon={faHandHoldingDollar}
+                className="text-lime-800 text-5xl"
+              />
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h4 className="text-xl font-semibold text-lime-800">Step 3</h4>
-              <p className="text-gray-600 mt-2">
-                Get notifications when prices drop and save items to your
-                wishlist.
-              </p>
+            <h4 className="text-xl font-semibold text-lime-800 mb-2">Step 2</h4>
+            <p className="text-gray-600 mb-4">
+              Compare prices and view price history trends.
+            </p>
+            <a href="#step2-details" className="text-lime-800 font-medium">
+              Learn More &rarr;
+            </a>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
+            <div className="flex items-center space-x-4 mb-4">
+              <FontAwesomeIcon
+                icon={faBell}
+                className="text-lime-800 text-5xl"
+              />
             </div>
+            <h4 className="text-xl font-semibold text-lime-800 mb-2">Step 3</h4>
+            <p className="text-gray-600 mb-4">
+              Get notifications when prices drop and save items to your
+              wishlist.
+            </p>
+            <a href="#step3-details" className="text-lime-800 font-medium">
+              Learn More &rarr;
+            </a>
           </div>
         </div>
       </section>
@@ -310,8 +362,115 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="p-6 bg-lime-800 text-white text-center">
-        <p>&copy; 2024 Bargain Buddy. All rights reserved.</p>
+      <footer className="Footer3 w-full px-5 py-12 bg-stone-50 color-primary flex flex-col justify-start items-center gap-12">
+        <div className="Content w-full max-w-6xl flex flex-col lg:flex-row justify-between items-start gap-12">
+          {/* Left Column */}
+          <div className="Column w-full lg:w-1/3 flex flex-col justify-start items-start gap-6">
+            <div className="ColorDark flex items-center">
+              <div className="LogoWide1 w-30 h-9 relative flex-col justify-start items-start flex text-lime-800 font-serif text-2xl">
+                Bargain Buddy
+                <span className="text-lime-800 text-2xl font-bold"></span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-1">
+                <div className="Address text-black text-Text-primary text-sm font-semibold leading-tight">
+                  Address:
+                </div>
+                <div className="Level112SampleStSydneyNsw2000 text-black text-Text-primary text-sm font-normal leading-tight">
+                  St. John's, Canada
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="Contact text-Text-primary text-sm text-black font-semibold leading-tight">
+                  Contact:
+                </div>
+                <div className="Container flex flex-col">
+                  <div className="text-Link-primary text-sm text-black font-normal underline leading-tight">
+                    709-123-4567
+                  </div>
+                  <div className="text-Link-primary text-black text-sm font-normal underline leading-tight">
+                    info@bargainbuddy.io
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="SocialLinks flex gap-3">
+              <div className="IconFacebook w-6 h-6 flex items-center justify-center">
+                📘
+              </div>
+              <div className="IconInstagram w-6 h-6 flex items-center justify-center">
+                📸
+              </div>
+              <div className="IconX w-6 h-6 flex items-center justify-center">
+                X
+              </div>
+              <div className="IconLinkedin w-6 h-6 flex items-center justify-center">
+                🔗
+              </div>
+              <div className="IconYoutube w-6 h-6 flex items-center justify-center">
+                ▶️
+              </div>
+            </div>
+          </div>
+
+          {/* Middle and Right Columns */}
+          <div className="Column w-full lg:w-2/3 flex flex-col lg:flex-row justify-end gap-10 mt-12">
+            <div className="LinkList flex flex-col gap-2">
+              <div className="Link text-Link-primary text-sm text-black font-semibold">
+                Help Center
+              </div>
+              <div className="Link text-Link-primary text-sm text-black font-semibold">
+                About Us
+              </div>
+              <div className="Link text-Link-primary text-sm text-black font-semibold">
+                Contact Support
+              </div>
+              <div className="Link text-Link-primary text-black text-sm font-semibold">
+                Blog Posts
+              </div>
+              <div className="Link text-Link-primary text-sm font-semibold text-black">
+                User Reviews
+              </div>
+            </div>
+            <div className="LinkList flex flex-col gap-2">
+              <div className="Link text-Link-primary text-sm font-semibold text-black">
+                FAQs
+              </div>
+              <div className="Link text-Link-primary text-sm font-semibold text-black">
+                Careers
+              </div>
+              <div className="Link text-Link-primary text-sm font-semibold text-black">
+                Affiliate Program
+              </div>
+              <div className="Link text-Link-primary text-sm font-semibold text-black">
+                Site Map
+              </div>
+              <div className="Link text-Link-primary text-sm font-semibold text-black">
+                Feedback
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider and Bottom Links */}
+        <div className="Credits w-full max-w-6xl flex flex-col gap-6">
+          <div className="Divider w-full h-px bg-Border-primary" />
+          <div className="Row flex flex-col md:flex-row justify-between items-center text-sm text-Text-primary text-black">
+            <div>© 2024 BargainBuddy. All rights reserved.</div>
+            <div className="FooterLinks flex gap-4">
+              <div className="PrivacyPolicy text-black text-Link-primary underline">
+                Privacy Policy
+              </div>
+              <div className="TermsOfService text-black text-Link-primary underline">
+                Terms of Service
+              </div>
+              <div className="CookiesSettings text-black text-Link-primary underline">
+                Cookies Settings
+              </div>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );
