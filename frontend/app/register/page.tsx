@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../firebaseConfig.js'
-import { admin } from '../../../firebaseAdmin.js'
+const axios = require('axios');
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -29,15 +29,12 @@ const RegisterPage = () => {
         // Register the user with Firebase
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const token = await userCredential.user.getIdToken();
-        const decodedToken = await admin.auth().verifyIdToken(token)
 
         const response = await axios.post(
-          "http://localhost:3001/createUser",
+          "../backend/api/registerUser.js",
           {
-            email: decodedToken.email,
             password: password,
-            userName: userName 
-            //Token: token
+            token: token
           }
         );
 

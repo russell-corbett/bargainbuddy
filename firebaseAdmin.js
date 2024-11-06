@@ -1,7 +1,7 @@
 // lib/firebaseAdmin.js
 import admin from 'firebase-admin';
 
-// Ensure you have a service account JSON file downloaded from your Firebase project
+/* // Ensure you have a service account JSON file downloaded from your Firebase project
 const serviceAccount = require('');
 
 if (!admin.apps.length) {
@@ -10,5 +10,5 @@ if (!admin.apps.length) {
     databaseURL: 'https://<YOUR-FIREBASE-PROJECT-ID>.firebaseio.com', // Adjust this URL accordingly
   });
 }
-
+*/
 export { admin };

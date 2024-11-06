@@ -11,7 +11,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [loginMessage, setLoginMessage] = useState('');
-  const navigate = useNavigate(); // Initialize navigate function
+  //const navigate = useNavigate(); // Initialize navigate function
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
