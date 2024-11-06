@@ -16,7 +16,7 @@ class ProductSearchService {
     let productName = null;
     let bestBuyResult = null;
     let walmartResult = null;
-
+  
     // #### Search logic is repeated in ItemSearchService.js. 
     // #### Please choose one place to keep the logic that you see fit.
 

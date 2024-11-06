@@ -107,6 +107,9 @@ class ItemSearchService {
     let bestBuyResult = null;
     let walmartResult = null;
 
+    // #### Search logic is repeated in ProductSearchService.js. 
+    // #### Please choose one place to keep the logic that you see fit.
+     
     // Try to get product name from BestBuy
     bestBuyResult = await this.bestBuyService.searchBestBuy(query, searchType);
     if (bestBuyResult && bestBuyResult.name) {

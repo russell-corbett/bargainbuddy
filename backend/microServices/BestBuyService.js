@@ -76,7 +76,7 @@ class BestBuyService {
       return null;
     }
   }
-
+  
   formatProductDetails(product) {
     return {
       name: product.name || null,
