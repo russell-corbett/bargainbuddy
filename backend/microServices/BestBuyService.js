@@ -33,7 +33,6 @@ class BestBuyService {
         default:
           throw new Error(`Invalid search type: ${searchType}`);
       }
-
       return productDetails;
     } catch (error) {
       console.error('Error in searchBestBuy:', error.message);

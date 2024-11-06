@@ -21,14 +21,12 @@ model User {
 }
 model Item {
   id                String     @id @default(cuid())
-  uniqueId          String     @unique
   name              String
   modelNumber       String?
   description       String?
   itemImg           String?
   currentBestPrice  Float?
   currentStore      String?
-  link              String?
   priceHistory      Price[]
   users             User[]     @relation("UserItems")
   userItems         UserItem[]
