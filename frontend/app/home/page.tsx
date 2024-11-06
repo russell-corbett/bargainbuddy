@@ -84,7 +84,7 @@ export default function LandingPage() {
           </div> */}
 
           <div className="flex text-black justify-center font-serif font-bold font-s mt-6 typing-placeholder duration-300">
-            Compare top store pirces
+            Compare top store prices
           </div>
 
           {/* Store Icons Section */}
