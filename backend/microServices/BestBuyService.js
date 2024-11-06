@@ -1,87 +1,92 @@
-const express = require("express");
-const { connectUserItem } = require("../api/endpoints/user/userController"); // Adjust the path as necessary
-const { createItem, updateItem, createPriceLog } = require("../api/endpoints/item/itemController"); // Adjust the path as necessary
-
-const app = express();
-app.use(express.json());
-
-const axios = require("axios");
-const db = require("../database");
+const axios = require('axios');
 
 class BestBuyService {
-	constructor() {
-		this.apiKey = "yAXuIGzr8Lnmm4pXN9MX2FQ5";
-		// this.modelNumber = '981-001256';
-	}
+  constructor() {
+    this.apiKey = process.env.BESTBUY_API_KEY || 'yAXuIGzr8Lnmm4pXN9MX2FQ5';
+  }
 
-	async fetchData(url) {
-		try {
-			//   console.log("Requesting data from:", url); // Add logging for debugging
-			const response = await axios.get(url, { timeout: 10000 });
-			//   console.log("Response data:", response.data.products); // Log the data received
-			return response.data;
-		} catch (error) {
-			console.error("Error fetching data:", error.message);
-			console.error("Error details:", error.response ? error.response.data : "No response data");
-			return null;
-		}
-	}
+  async fetchData(url) {
+    try {
+      const response = await axios.get(url, { timeout: 10000 });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching data from BestBuy:', error.message);
+      console.error('Error details:', error.response ? error.response.data : 'No response data');
+      return null;
+    }
+  }
 
-	async fetchProductDetails(mn) {
-		const productUrl = `https://api.bestbuy.com/v1/products(modelNumber=${mn})?apiKey=${this.apiKey}&format=json`;
-		const productData = await this.fetchData(productUrl);
+  async searchBestBuy(query, searchType) {
+    try {
+      let productDetails = null;
 
-		if (productData && productData.products && productData.products.length > 0) {
-			const product = productData.products[0];
-			const productDetails = {
-				name: product.name,
-				sku: product.sku,
-				price: product.salePrice,
-				productPicture: product.image,
-			};
-			return productDetails;
-		} else {
-			throw new Error("Product information not found");
-		}
-	}
+      switch (searchType) {
+        case 'upc':
+          productDetails = await this.fetchProductByUPC(query);
+          break;
+        case 'modelNumber':
+          productDetails = await this.fetchProductByModelNumber(query);
+          break;
+        case 'productName':
+          productDetails = await this.fetchProductByName(query);
+          break;
+        default:
+          throw new Error(`Invalid search type: ${searchType}`);
+      }
 
-	//   async fetchHistoricalPrices(sku) {
-	//     const historicalPricesUrl = `https://api.bestbuy.com/v1/products/${sku}/priceHistory?apiKey=${this.apiKey}&format=json`;
-	//     const historicalPricesData = await this.fetchData(historicalPricesUrl);
+      return productDetails;
+    } catch (error) {
+      console.error('Error in searchBestBuy:', error.message);
+      return null;
+    }
+  }
 
-	//     if (historicalPricesData && historicalPricesData.priceHistory) {
-	//       return historicalPricesData.priceHistory;
-	//     } else {
-	//       return [];
-	//     }
-	//   }
+  async fetchProductByUPC(upc) {
+    const url = `https://api.bestbuy.com/v1/products(upc=${upc})?apiKey=${this.apiKey}&format=json`;
+    const data = await this.fetchData(url);
 
-	async searchBestBuy(model_number) {
-		try {
-			const productDetails = await this.fetchProductDetails(model_number);
+    if (data && data.products && data.products.length > 0) {
+      const product = data.products[0];
+      return this.formatProductDetails(product);
+    } else {
+      return null;
+    }
+  }
 
-			const item_body = {
-				name: productDetails.name,
-				modelNumber: model_number,
-				currentBestPrice: productDetails.price,
-				itemImg: productDetails.productPicture,
-			};
+  async fetchProductByModelNumber(modelNumber) {
+    const url = `https://api.bestbuy.com/v1/products(modelNumber="${encodeURIComponent(modelNumber)}")?apiKey=${this.apiKey}&format=json`;
+    const data = await this.fetchData(url);
 
-			const userItem_body = {
-				email: "zrcoffey@mun.ca",
-				modelNumber: model_number,
-			};
+    if (data && data.products && data.products.length > 0) {
+      const product = data.products[0];
+      return this.formatProductDetails(product);
+    } else {
+      return null;
+    }
+  }
 
-			// Create a new item record in the database
-			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
+  async fetchProductByName(productName) {
+    const url = `https://api.bestbuy.com/v1/products((search=${encodeURIComponent(productName)}))?apiKey=${this.apiKey}&sort=name.asc&show=sku,name,salePrice,image,url,modelNumber&format=json`;
+    const data = await this.fetchData(url);
 
-			// Connect the user to the item
-			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
-		} catch (error) {
-			console.error("Error in searchBestBuy:", error.message);
-			return { error: error.message };
-		}
-	}
+    if (data && data.products && data.products.length > 0) {
+      const product = data.products[0];
+      return this.formatProductDetails(product);
+    } else {
+      return null;
+    }
+  }
+
+  formatProductDetails(product) {
+    return {
+      name: product.name || null,
+      price: product.salePrice || null,
+      link: product.url || null,
+      image: product.image || null,
+      modelNumber: product.modelNumber || null,
+      id: product.sku ? product.sku.toString() : null,
+    };
+  }
 }
 
 module.exports = BestBuyService;
