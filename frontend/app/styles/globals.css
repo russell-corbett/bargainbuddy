@@ -30,7 +30,7 @@ body {
 }
 
 /* Import Poppins font */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap");
 
 /* Reset universal styling */
 * {
@@ -42,10 +42,8 @@ body {
 /* Apply Poppins to body and inputs */
 body,
 input {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
-
-/* Styles merged from styles.css */
 
 /* Container styles */
 .container {
@@ -166,13 +164,13 @@ form {
 }
 
 .social-icon:hover {
-  color: #1A2E05;
-  border-color: #1A2E05;
+  color: #1a2e05;
+  border-color: #1a2e05;
 }
 
 .btn {
   width: 150px;
-  background-color: #1A2E05;
+  background-color: #1a2e05;
   border: none;
   outline: none;
   height: 49px;
@@ -200,14 +198,14 @@ form {
 }
 
 .container::before {
-  content: '';
+  content: "";
   position: absolute;
   height: 2000px;
   width: 2000px;
   top: -10%;
   right: 48%;
   transform: translateY(-50%);
-  background-image: linear-gradient(-45deg, #1A2E05 0%, #04befe 100%);
+  background-image: linear-gradient(-45deg, #1a2e05 0%, #04befe 100%);
   transition: 1.8s ease-in-out;
   border-radius: 50%;
   z-index: 6;
@@ -303,6 +301,32 @@ form {
 }
 
 /* Responsive design */
+
+
+@media (max-width: 570px) {
+  form {
+    padding: 0 1.5rem;
+  }
+
+  .panel .content {
+    padding: 0.5rem 1rem;
+  }
+
+  .container {
+    padding: 1.5rem;
+  }
+
+  .container::before {
+    bottom: 72%;
+    left: 50%;
+  }
+
+  .container.sign-up-mode::before {
+    bottom: 28%;
+    left: 50%;
+  }
+}
+
 @media (max-width: 870px) {
   .container {
     min-height: 800px;
@@ -400,26 +424,4 @@ form {
   }
 }
 
-@media (max-width: 570px) {
-  form {
-    padding: 0 1.5rem;
-  }
 
-  .panel .content {
-    padding: 0.5rem 1rem;
-  }
-
-  .container {
-    padding: 1.5rem;
-  }
-
-  .container::before {
-    bottom: 72%;
-    left: 50%;
-  }
-
-  .container.sign-up-mode::before {
-    bottom: 28%;
-    left: 50%;
-  }
-}
