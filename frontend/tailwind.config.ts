@@ -11,6 +11,11 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        primary: "#f7ba34",
+        secondary: "#69a79c",
+        light: "#f7f7f7",
+        dark: "#333333",
+        dark2: "#999999",
       },
       fontFamily: {
         dynapuff: ['Dynapuff', 'cursive'],
@@ -20,6 +25,16 @@ const config: Config = {
       },
       rotate:{
         'y-180': 'rotateY(180deg)',
+      },
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: "1rem",
+          sm: "2rem",
+          lg: "4rem",
+          xl: "5rem",
+          "2xl": "6rem",
+        },
       },
     },
   },

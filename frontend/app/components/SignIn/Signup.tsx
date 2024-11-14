@@ -53,7 +53,9 @@ const Signup: React.FC = () => {
               <input type="password" placeholder="Password" />
             </div>
             <input type="submit" value="Login" className="btn solid" />
-            <p className="social-text text-black">Or Sign in with social platforms</p>
+            <p className="social-text text-black">
+              Or Sign in with social platforms
+            </p>
             <div className="social-media">
               <a href="#" className="social-icon">
                 <FontAwesomeIcon icon={faFacebookF} />
@@ -90,7 +92,9 @@ const Signup: React.FC = () => {
               <input type="password" placeholder="Password" />
             </div>
             <input type="submit" className="btn" value="Sign up" />
-            <p className="social-text text-black">Or Sign up with social platforms</p>
+            <p className="social-text text-black">
+              Or Sign up with social platforms
+            </p>
             <div className="social-media">
               <a href="#" className="social-icon">
                 <FontAwesomeIcon icon={faFacebookF} />
@@ -114,9 +118,7 @@ const Signup: React.FC = () => {
         <div className="panel left-panel">
           <div className="content">
             <h3>New here?</h3>
-            <p>
-              Shop smarter by creating your Bargain Buddy Account
-            </p>
+            <p>Shop smarter by creating your Bargain Buddy Account</p>
             <button className="btn transparent" onClick={handleSignUpClick}>
               Sign up
             </button>
@@ -125,9 +127,7 @@ const Signup: React.FC = () => {
         <div className="panel right-panel">
           <div className="content">
             <h3>Already have an account?</h3>
-            <p>
-              View your wishlist when you sign-in
-            </p>
+            <p>View your wishlist when you sign-in</p>
             <button className="btn transparent" onClick={handleSignInClick}>
               Sign in
             </button>
