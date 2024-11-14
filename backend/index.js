@@ -58,6 +58,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addToWishlist", (data) => {
+    
     bestBuyApiRef.searchBestBuy(data.modelNumber);
   });
 
