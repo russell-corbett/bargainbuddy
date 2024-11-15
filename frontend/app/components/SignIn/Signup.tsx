@@ -9,6 +9,13 @@ import {
   faGoogle,
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
+import { motion } from "framer-motion";
+
+
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 1.5, ease: "easeInOut" } },
+};
 
 const Signup: React.FC = () => {
   const [isSignUpMode, setIsSignUpMode] = useState(false);
@@ -34,10 +41,14 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}>
+    <motion.div
+      className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}
+      variants={fadeIn}
+      initial="initial"
+      animate="animate"
+    >
       <div className="forms-container">
         <div className="signin-signup">
-          {/* Sign In Form */}
           <form
             action="#"
             className="sign-in-form"
@@ -72,7 +83,6 @@ const Signup: React.FC = () => {
             </div>
           </form>
 
-          {/* Sign Up Form */}
           <form
             action="#"
             className="sign-up-form"
@@ -113,7 +123,6 @@ const Signup: React.FC = () => {
         </div>
       </div>
 
-      {/* Panels */}
       <div className="panels-container">
         <div className="panel left-panel">
           <div className="content">
@@ -134,7 +143,7 @@ const Signup: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
