@@ -5,25 +5,28 @@ const cors = require("cors");
 const Database = require("./database");
 const userRoutes = require("./api/endpoints/user/userRoutes");
 const itemRoutes = require("./api/endpoints/item/itemRoutes");
+const { connectUserItem } = require("./api/endpoints/user/userController");
+const { createItem } = require("./api/endpoints/item/itemController");
 const priceRoutes = require("./api/endpoints/price/priceRoutes");
 const trendRoutes = require("./api/endpoints/trend/trendRoutes");
-const BestBuyService = require("./microServices/BestBuyService"); // Corrected path
+const ProductSearch = require("./microServices/ProductSearchService");
+const axios = require("axios");
 
 const app = express();
 const port = 3001;
 const server = http.createServer(app);
 const io = socketIO(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+	cors: {
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST"],
+	},
 });
 
 let clientsConnected = 0;
 
 const db = Database;
 
-const bestBuyApiRef = new BestBuyService();
+const productSearch = new ProductSearch();
 
 // Enable CORS for all routes
 app.use(cors());
@@ -35,38 +38,49 @@ app.use(trendRoutes);
 
 // Close the database connection on server shutdown
 process.on("SIGINT", async () => {
-  await db.close();
-  server.close(() => {
-    console.log("Server closed");
-    process.exit(0);
-  });
+	await db.close();
+	server.close(() => {
+		console.log("Server closed");
+		process.exit(0);
+	});
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+	res.send("Hello World!");
 });
 
 io.on("connection", (socket) => {
-  clientsConnected++;
-  console.log(
-    `New client connected ${socket.id}. Total Clients Connected: ${clientsConnected}`
-  );
+	clientsConnected++;
+	console.log(`New client connected ${socket.id}. Total Clients Connected: ${clientsConnected}`);
 
-  socket.on("disconnect", () => {
-    clientsConnected--;
-    console.log(`Client has disconnected ${socket.id}`);
-  });
+	socket.on("disconnect", () => {
+		clientsConnected--;
+		console.log(`Client has disconnected ${socket.id}`);
+	});
 
-  socket.on("addToWishlist", (data) => {
-    
-    bestBuyApiRef.searchBestBuy(data.modelNumber);
-  });
+	socket.on("addToWishlist", async (data) => {
+		product = await productSearch.searchProduct(data.modelNumber, "modelNumber");
+		// prisma.add(product, userToken)
+		const item_body = {
+			name: product[0].name,
+			modelNumber: data.modelNumber,
+			currentBestPrice: product[0].price,
+			itemImg: product[0].image,
+		};
 
-//   socket.on("modelNumber", (data) => {
-//     console.log("ModelNumber event");
-//   });
+		const userItem_body = {
+			email: "zrcoffey@mun.ca",
+			modelNumber: data.modelNumber,
+		};
+		await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
+		await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
+	});
+
+	//   socket.on("modelNumber", (data) => {
+	//     console.log("ModelNumber event");
+	//   });
 });
 
 server.listen(port, () => {
-  console.log("Server is listening.");
+	console.log("Server is listening.");
 });
