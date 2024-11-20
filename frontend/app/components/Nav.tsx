@@ -58,7 +58,7 @@ export default function Nav() {
   };
 
   return (
-    <nav className="flex justify-between items-center p-4 bg-white border-b w-full">
+    <nav className="flex flex-wrap justify-between items-center p-4 bg-white border-b w-full">
       {/* Left side with dropdown menu */}
       <div className="relative">
         {/* Menu Icon */}
@@ -111,7 +111,7 @@ export default function Nav() {
       </div>
 
       {/* Centered Bargain Buddy Logo */}
-      <div className="flex absolute left-1/2 transform -translate-x-1/2">
+      <div className="flex flex-auto justify-center">
         <span className="text-primary font-bold text-2xl md:text-3xl font-serif">
           Bargain
         </span>
@@ -121,12 +121,12 @@ export default function Nav() {
       </div>
 
       {/* Right Side: Search with Filter */}
-      <div className="flex items-center space-x-4 md:space-x-8">
+      <div className="flex flex-row items-center space-x-4 w-full md:w-auto mt-4 md:mt-0 justify-center md:flex-nowrap">
         {isSearchOpen && (
           <form
             id="searchForm"
             onSubmit={handleSubmit}
-            className="relative flex items-center border rounded-full px-4 py-2 w-80 h-10 overflow-visible"
+            className="relative flex items-center border rounded-full px-4 py-2 w-80 h-10 overflow-visible md:mr-2"
           >
             <div className="relative flex items-center w-72 h-10">
               {/* Search Input */}
@@ -134,7 +134,7 @@ export default function Nav() {
                 type="text"
                 value={modelNumber}
                 onChange={(e) => setModelNumber(e.target.value)}
-                className=" flex-grow outline-none text-left text-black px-4 py-2 h-9 w-full rounded-l-full"
+                className="flex-grow outline-none text-left text-black px-4 py-2 h-9 w-full rounded-l-full"
                 placeholder={
                   searchType === "model"
                     ? "Search by Model Number..."
@@ -175,7 +175,9 @@ export default function Nav() {
                     onClick={() => handleSearchTypeSelect("product")}
                   >
                     <FontAwesomeIcon
-                      icon={searchType === "product" ? faCheckCircle : faCircle}
+                      icon={
+                        searchType === "product" ? faCheckCircle : faCircle
+                      }
                       className={`mr-2 ${
                         searchType === "product"
                           ? "text-dark"
@@ -193,9 +195,7 @@ export default function Nav() {
         {/* Search Button with Animation */}
         <button
           type="button"
-          className={`bg-dark text-white ${
-            isSearchOpen ? "rounded-xl px-6 py-2" : "rounded-full w-9 h-9"
-          } hover:bg-dark transition-all duration-300`}
+          className={`bg-dark text-white rounded-xl px-6 py-2 hover:bg-dark transition-all duration-300`}
           onClick={handleSearchButtonClick}
         >
           <div className="transition-all duration-300">
