@@ -9,6 +9,13 @@ import {
   faGoogle,
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
+import { motion } from "framer-motion";
+
+
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 1.5, ease: "easeInOut" } },
+};
 
 const Signup: React.FC = () => {
   const [isSignUpMode, setIsSignUpMode] = useState(false);
@@ -34,10 +41,14 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}>
+    <motion.div
+      className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}
+      variants={fadeIn}
+      initial="initial"
+      animate="animate"
+    >
       <div className="forms-container">
         <div className="signin-signup">
-          {/* Sign In Form */}
           <form
             action="#"
             className="sign-in-form"
@@ -53,7 +64,9 @@ const Signup: React.FC = () => {
               <input type="password" placeholder="Password" />
             </div>
             <input type="submit" value="Login" className="btn solid" />
-            <p className="social-text text-black">Or Sign in with social platforms</p>
+            <p className="social-text text-black">
+              Or Sign in with social platforms
+            </p>
             <div className="social-media">
               <a href="#" className="social-icon">
                 <FontAwesomeIcon icon={faFacebookF} />
@@ -70,7 +83,6 @@ const Signup: React.FC = () => {
             </div>
           </form>
 
-          {/* Sign Up Form */}
           <form
             action="#"
             className="sign-up-form"
@@ -90,7 +102,9 @@ const Signup: React.FC = () => {
               <input type="password" placeholder="Password" />
             </div>
             <input type="submit" className="btn" value="Sign up" />
-            <p className="social-text text-black">Or Sign up with social platforms</p>
+            <p className="social-text text-black">
+              Or Sign up with social platforms
+            </p>
             <div className="social-media">
               <a href="#" className="social-icon">
                 <FontAwesomeIcon icon={faFacebookF} />
@@ -109,14 +123,11 @@ const Signup: React.FC = () => {
         </div>
       </div>
 
-      {/* Panels */}
       <div className="panels-container">
         <div className="panel left-panel">
           <div className="content">
             <h3>New here?</h3>
-            <p>
-              Shop smarter by creating your Bargain Buddy Account
-            </p>
+            <p>Shop smarter by creating your Bargain Buddy Account</p>
             <button className="btn transparent" onClick={handleSignUpClick}>
               Sign up
             </button>
@@ -125,16 +136,14 @@ const Signup: React.FC = () => {
         <div className="panel right-panel">
           <div className="content">
             <h3>Already have an account?</h3>
-            <p>
-              View your wishlist when you sign-in
-            </p>
+            <p>View your wishlist when you sign-in</p>
             <button className="btn transparent" onClick={handleSignInClick}>
               Sign in
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
