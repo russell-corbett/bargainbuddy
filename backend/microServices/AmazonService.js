@@ -1,10 +1,8 @@
-// services/AmazonService.js
-const axios = require('axios');
-const cheerio = require('cheerio');
+const axios = require('axios'); // to make HTTP requests
+const cheerio = require('cheerio'); //parse and manipulate HTML.
 
 class AmazonService {
   constructor() {
-    // Initialization if needed
   }
 
   async searchAmazon(productName) {
@@ -25,7 +23,7 @@ class AmazonService {
       let bestItem = null;
       let bestScore = 0;
 
-      $(itemSelector).each((i, elem) => {
+      $(itemSelector).each((i, elem) => { //loop through each item matching itemSelector using cheerio
         const element = $(elem);
         const name = element.find(selectors.name).text().trim() || null;
         let price = element.find(selectors.price).first().text().trim() || null;
@@ -55,19 +53,19 @@ class AmazonService {
           price = parseFloat(price);
         }
 
-        const score = [name, price, link, image, id].filter(Boolean).length;
+        const score = [name, price, link, image].filter(Boolean).length;
 
         if (score > bestScore) {
-          bestItem = { name, price, link, image, id, modelNumber: null };
+          bestItem = { store: 'Amazon', name, price, link, image, modelNumber: null, upc: null, id };
           bestScore = score;
         }
 
-        if (score === 5) return false; // exit loop early if perfect match
+        if (score === 4) return false; // Exit loop early if perfect match
       });
 
       return bestItem;
     } catch (error) {
-      console.error(`Error fetching data from Amazon:`, error.message);
+      console.error('Error searching Amazon:', error.message);
       return null;
     }
   }

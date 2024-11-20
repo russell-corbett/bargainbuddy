@@ -1,45 +1,31 @@
-// ItemSearchService.js
 const { PrismaClient } = require('@prisma/client');
-const AmazonService = require('./AmazonService.js');
-const BestBuyService = require('./BestBuyService.js');
-const WalmartService = require('./WalmartService.js');
-const EbayService = require('./EbayService.js');
-
+const ProductSearchLogic = require('./ProductSearchLogic');
+a
 class ItemSearchService {
   constructor() {
-    this.amazonService = new AmazonService();
-    this.bestBuyService = new BestBuyService();
-    this.walmartService = new WalmartService();
-    this.ebayService = new EbayService();
+    this.searchService = new ProductSearchLogic();
     this.prisma = new PrismaClient();
     console.log('Item search service constructed');
   }
 
   async searchAndStoreItem(query, email, searchType) {
     try {
-      const results = await this.searchProduct(query, searchType);
+      const results = await this.searchService.searchProduct(query, searchType);
 
       if (results.length === 0) {
         return { message: 'No products found' };
       }
 
-      // Get user
       const user = await this.prisma.user.findUnique({ where: { email } });
-
       if (!user) {
         return { message: 'User not found' };
       }
 
       for (const result of results) {
         const { store, name, price, link, image, modelNumber, upc } = result;
-
         const uniqueId = modelNumber || upc || name;
 
-        // Find or create the item
-        let item = await this.prisma.item.findUnique({
-          where: { uniqueId },
-        });
-
+        let item = await this.prisma.item.findUnique({ where: { uniqueId } });
         if (!item) {
           item = await this.prisma.item.create({
             data: {
@@ -60,7 +46,7 @@ class ItemSearchService {
             },
           });
         } else {
-          // Update item price if necessary
+          // Update currentBestPrice if the new price is lower
           if (parseFloat(price) < item.currentBestPrice) {
             await this.prisma.item.update({
               where: { id: item.id },
@@ -100,49 +86,6 @@ class ItemSearchService {
       console.error('Error searching and storing item:', error);
       throw new Error(`Error searching and storing item: ${error.message}`);
     }
-  }
-
-  async searchProduct(query, searchType) {
-    let productName = null;
-    let bestBuyResult = null;
-    let walmartResult = null;
-
-    // #### Search logic is repeated in ProductSearchService.js. 
-    // #### Please choose one place to keep the logic that you see fit.
-     
-    // Try to get product name from BestBuy
-    bestBuyResult = await this.bestBuyService.searchBestBuy(query, searchType);
-    if (bestBuyResult && bestBuyResult.name) {
-      productName = bestBuyResult.name;
-    }
-
-    // If no product name from BestBuy, try Walmart
-    if (!productName) {
-      walmartResult = await this.walmartService.searchWalmart(query);
-      if (walmartResult && walmartResult.name) {
-        productName = walmartResult.name;
-      }
-    }
-
-    // If still no product name, assume query is a product name
-    if (!productName) {
-      productName = query;
-    }
-
-    // Search Amazon and eBay using the product name
-    const [amazonResult, ebayResult] = await Promise.all([
-      this.amazonService.searchAmazon(productName),
-      this.ebayService.searchEbay(productName),
-    ]);
-
-    const results = [];
-
-    if (bestBuyResult) results.push({ store: 'BestBuy', ...bestBuyResult });
-    if (walmartResult) results.push({ store: 'Walmart', ...walmartResult });
-    if (amazonResult) results.push({ store: 'Amazon', ...amazonResult });
-    if (ebayResult) results.push({ store: 'eBay', ...ebayResult });
-
-    return results;
   }
 }
 

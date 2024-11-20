@@ -1,11 +1,8 @@
-// services/EbayService.js
 const axios = require('axios');
 const cheerio = require('cheerio');
 
 class EbayService {
-  constructor() {
-    // Initialization if needed
-  }
+  constructor() {}
 
   async searchEbay(productName) {
     const url = `https://www.ebay.ca/sch/i.html?_nkw=${encodeURIComponent(productName)}`;
@@ -66,7 +63,7 @@ class EbayService {
         const score = [name, price, link, image].filter(Boolean).length;
 
         if (score > bestScore) {
-          bestItem = { name, price, link, image, id: null, modelNumber: null };
+          bestItem = { store: 'eBay', name, price, link, image, id: null, modelNumber: null }; // Added store name
           bestScore = score;
         }
 
