@@ -5,10 +5,11 @@ class Database {
     this.prisma = new PrismaClient();
   }
 
-  async getRecord(model, where) {
+  async getRecord(model, where, options = {}) {
     try {
       return await this.prisma[model].findFirst({
         where: where,
+        ...options, // Allows to include relational data like Item.priceHistory (see getPrices function for example)
       });
     } catch (error) {
       throw new Error(`Error getting record: ${error.message}`);
