@@ -31,8 +31,8 @@ export default function TechPage() {
         Technology
       </h1>
       {products.length > 0 ? (
-        <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mt-8">
+        <div className="flex justify-center w-full mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 w-auto mx-auto">
             {products.map((product, index) => (
               <ProductCard key={index} product={product} />
             ))}
