@@ -519,18 +519,24 @@ import {
   FaWhatsapp,
   FaYoutube,
   FaBookReader,
+  FaList,
 } from "react-icons/fa";
 import { TbWorldWww } from "react-icons/tb";
-import { GrUserExpert } from "react-icons/gr";
-import { MdOutlineAccessTime } from "react-icons/md";
+import { GrList, GrUserExpert } from "react-icons/gr";
+import { MdAttachMoney, MdOutlineAccessTime } from "react-icons/md";
 import { IoIosArrowRoundForward } from "react-icons/io";
-import { CiMobile3 } from "react-icons/ci";
-import { IoMdMenu } from "react-icons/io";
+import { FaArrowTrendUp } from "react-icons/fa6";
+import { MdCompareArrows } from "react-icons/md";
+import { FaThList } from "react-icons/fa";
+import { IoMdLink } from "react-icons/io";
+import { CiShoppingTag, CiViewTimeline } from "react-icons/ci";
 import { motion } from "framer-motion";
-import BannerPng from "../../app/srcImages/banner.png";
+import BannerPng from "../../app/srcImages/banner.svg";
 import Blob from "../../app/srcImages/blob.svg";
-import HeroPng from "../../app/srcImages/hero.png";
 import Navbar from "../components/landingPage/Nav";
+import hero from "../srcImages/hero.svg";
+
+
 
 const FadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 50 },
@@ -596,7 +602,7 @@ const LandingPage: React.FC = () => {
           </div>
           <div className="flex justify-center items-center">
             <MotionImage
-              src={HeroPng} // `StaticImageData` works here
+              src={hero} // `StaticImageData` works here
               alt="Hero"
               width={600} // You must specify width and height
               height={400}
@@ -618,24 +624,47 @@ const LandingPage: React.FC = () => {
 
       {/* Services Section */}
       <section className="bg-white py-16">
-        <div className="container">
-          <h1 className="text-4xl font-bold text-[#69A79C] mb-10 justify-items-center">
-            How it Works
+        <div className="container flex flex-col items-center">
+          <h1 className="text-4xl font-bold mb-10 text-center">
+            Why Bargain Buddy?
           </h1>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-center">
             {[
               {
                 id: 1,
                 title: "Compare Prices",
-                icon: <TbWorldWww />,
+                icon: <span className="text-primary"><MdCompareArrows /></span>,
                 delay: 0.2,
               },
-              { id: 2, title: "Track Prices", icon: <CiMobile3 />, delay: 0.3 },
+              { 
+                id: 2, 
+                title: "Track Prices", 
+                icon: <span className="text-primary"><CiViewTimeline  /></span>, 
+                delay: 0.3 
+              },
               {
                 id: 3,
-                title: "Save Money",
-                icon: <FaBookReader />,
+                title: "Price Trends",
+                icon: <span className="text-primary"><FaArrowTrendUp /></span>,
                 delay: 0.5,
+              },
+              {
+                id: 4,
+                title: "Smart Wishlist",
+                icon: <span className="text-primary"><FaThList/></span>,
+                delay: 0.6,
+              },
+              {
+                id: 5,
+                title: "Smart Shopping",
+                icon: <span className="text-primary"><CiShoppingTag /></span>,
+                delay: 0.7,
+              },
+              {
+                id: 6,
+                title: "Save Money",
+                icon: <span className="text-primary"><MdAttachMoney /></span>,
+                delay: 0.8,
               },
             ].map((service) => (
               <motion.div
@@ -670,13 +699,13 @@ const LandingPage: React.FC = () => {
           </div>
           <div className="flex flex-col justify-center text-center md:text-left space-y-12">
             <motion.h1 className="text-3xl md:text-4xl font-bold">
-              Why Bargain Buddy?
+              How it works?
             </motion.h1>
             <div className="flex flex-col gap-6">
               {[
-                { icon: <FaBookReader />, text: "Compare Prices" },
-                { icon: <GrUserExpert />, text: "Track Prices" },
-                { icon: <MdOutlineAccessTime />, text: "Save Money" },
+                { icon: <span className="text-primary"><IoMdLink/></span>, text: "Paste product link" },
+                { icon: <span className="text-primary"><MdCompareArrows/></span>, text: "Compare item prices" },
+                { icon: <span className="text-primary"><GrList/></span>, text: "Save items to your wishlist" },
               ].map((item, index) => (
                 <motion.div
                   key={index}

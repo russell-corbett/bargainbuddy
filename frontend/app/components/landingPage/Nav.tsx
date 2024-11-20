@@ -40,8 +40,9 @@ const Navbar = () => {
         className="container py-10 flex justify-between items-center"
       >
         {/* Logo section */}
-        <div>
-          <h1 className="font-bold text-2xl">Bargain Buddy</h1>
+        <div className="flex relative">
+          <h1 className="font-bold text-2xl font-serif text-primary">Bargain </h1>
+          <h1 className="absoulte font-bold text-2xl font-serif text-secondary gap">Buddy</h1>
         </div>
         {/* Menu section */}
         <div className="hidden lg:block">

@@ -63,7 +63,7 @@ export default function Nav() {
         {/* Menu Icon */}
         <button
           onClick={toggleDropdown}
-          className="flex items-center p-2 text-2xl text-lime-800 hover:text-lime-700 focus:outline-none"
+          className="flex items-center p-2 text-2xl text-dark hover:text-dark2 focus:outline-none"
         >
           <FontAwesomeIcon icon={faBars} />
         </button>
@@ -75,7 +75,7 @@ export default function Nav() {
               href="/profile"
               className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
-              <FontAwesomeIcon icon={faUser} className="mr-2 text-lime-800" />
+              <FontAwesomeIcon icon={faUser} className="mr-2 text-primary" />
               Profile
             </a>
             <a
@@ -84,7 +84,7 @@ export default function Nav() {
             >
               <FontAwesomeIcon
                 icon={faBasketShopping}
-                className="mr-2 text-lime-800"
+                className="mr-2 text-primary"
               />
               Groceries
             </a>
@@ -94,7 +94,7 @@ export default function Nav() {
             >
               <FontAwesomeIcon
                 icon={faMicrochip}
-                className="mr-2 text-lime-800"
+                className="mr-2 text-primary"
               />
               Technology
             </a>
@@ -102,7 +102,7 @@ export default function Nav() {
               href="/settings"
               className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
             >
-              <FontAwesomeIcon icon={faGear} className="mr-2 text-lime-800" />
+              <FontAwesomeIcon icon={faGear} className="mr-2 text-primary" />
               Settings
             </a>
           </div>
@@ -110,9 +110,12 @@ export default function Nav() {
       </div>
 
       {/* Centered Bargain Buddy Logo */}
-      <div className="absolute left-1/2 transform -translate-x-1/2">
-        <span className="text-lime-800 text-2xl md:text-3xl font-serif">
-          Bargain Buddy
+      <div className="flex absolute left-1/2 transform -translate-x-1/2">
+        <span className="text-primary font-bold text-2xl md:text-3xl font-serif">
+          Bargain
+        </span>
+        <span className="text-secondary font-bold text-2xl md:text-3xl font-serif">
+          Buddy
         </span>
       </div>
 
@@ -153,37 +156,29 @@ export default function Nav() {
               <div className="absolute top-10 right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-30">
                 <ul className="py-2">
                   <li
-                    className="flex items-center text-lime-800 px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    className="flex items-center text-dark px-4 py-2 cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSearchTypeSelect("model")}
                   >
                     <FontAwesomeIcon
-                      icon={
-                        searchType === "model"
-                          ? faCheckCircle
-                          : faCircle
-                      }
+                      icon={searchType === "model" ? faCheckCircle : faCircle}
                       className={`mr-2 ${
                         searchType === "model"
-                          ? "text-lime-800"
-                          : "text-white text-bold border rounded-full border-lime-800"
+                          ? "text-dark"
+                          : "text-white text-bold border rounded-full border-dark"
                       }`}
                     />
                     Model Number
                   </li>
                   <li
-                    className="flex items-center text-lime-800 px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    className="flex items-center text-dark px-4 py-2 cursor-pointer hover:bg-gray-100"
                     onClick={() => handleSearchTypeSelect("product")}
                   >
                     <FontAwesomeIcon
-                      icon={
-                        searchType === "product"
-                          ? faCheckCircle
-                          : faCircle
-                      }
+                      icon={searchType === "product" ? faCheckCircle : faCircle}
                       className={`mr-2 ${
                         searchType === "product"
-                          ? "text-lime-800"
-                          : "text-white text-bold border rounded-full border-lime-800"
+                          ? "text-dark"
+                          : "text-white text-bold border rounded-full border-dark"
                       }`}
                     />
                     Product Name
@@ -197,9 +192,9 @@ export default function Nav() {
         {/* Search Button with Animation */}
         <button
           type="button"
-          className={`bg-lime-800 text-white ${
+          className={`bg-dark text-white ${
             isSearchOpen ? "rounded-xl px-6 py-2" : "rounded-full w-9 h-9"
-          } hover:bg-lime-900 transition-all duration-300`}
+          } hover:bg-dark transition-all duration-300`}
           onClick={handleSearchButtonClick}
         >
           <div className="transition-all duration-300">
