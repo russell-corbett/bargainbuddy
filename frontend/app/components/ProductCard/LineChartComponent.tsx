@@ -8,38 +8,44 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
 
 interface DataPoint {
-  month: string;
-  price: number;
+  monthDay: string;
+  bestBuy: number;
+  walmart: number;
 }
 
-const mockData: DataPoint[] = [
-  { month: "Jan", price: 100 },
-  { month: "Feb", price: 101 },
-  { month: "Mar", price: 200 },
-  { month: "Apr", price: 160 },
-  { month: "May", price: 90 },
-  { month: "Jun", price: 1500 },
-  
-];
+interface LineChartComponentProps {
+  data: DataPoint[]; // Define the type for the data prop
+}
 
-const LineChartComponent: React.FC = () => {
-  return (
-    <div className="w-full h-72">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={mockData} margin={{ right: 30 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
-          <YAxis domain={["auto", "auto"]} />
-          <Tooltip />
-          <Line type="monotone" dataKey="price" stroke="#3F6212" />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
-};
+class LineChartComponent extends React.Component<LineChartComponentProps> {
+  constructor(props: LineChartComponentProps) {
+    super(props);
+  }
+
+  render() {
+    const { data } = this.props; // Access the data from props
+
+    return (
+      <div className="w-full h-72">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ right: 30 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="monthDay" /> {/* Changed "monthDay" to "month" */}
+            <YAxis domain={["auto", "auto"]} />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="bestbuy" stroke="#3F6212" />
+            <Line type="monotone" dataKey="walmart" stroke="#3D85C6" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+}
 
 export default LineChartComponent;

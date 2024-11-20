@@ -106,6 +106,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import LineChartComponent from "./LineChartComponent";
 
+// Need this file to trust that this is the is the structure for DataPoint (defined in LineChartComponent)
+export interface DataPoint{
+  monthDay: string;
+  bestBuy: number;
+  walmart: number;
+};
+
 interface ProductItem {
   itemImg: string;
   currentBestPrice: number;
@@ -119,9 +126,10 @@ interface Product {
 
 interface ProductCardProps {
   product: Product;
+  date_price_data: DataPoint[];
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, date_price_data}) => {
   const [flipped, setFlipped] = useState<boolean>(false);
   const [backContent, setBackContent] = useState<"wishlist" | "chart" | null>(
     null
@@ -215,7 +223,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {backContent === "chart" && (
             <div className="w-full h-full flex flex-col">
               <div className="w-full flex-1">
-                <LineChartComponent />
+                <LineChartComponent data={date_price_data} />
               </div>
               <button
                 className="bg-lime-800 text-white flex items-center justify-center p-2 rounded-full w-10 h-10 hover:scale-105 transition-all duration-300 self-center"

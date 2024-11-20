@@ -20,6 +20,7 @@ interface userItemsResponse {
 
 export default function TechPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [priceData, setPriceData] = useState<{ [key: string]: any[] }>({}); // Store price data by product ID
 
   const socket = getSocket();
 
@@ -47,7 +48,11 @@ export default function TechPage() {
         <div className="flex justify-center">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mt-8">
             {products.map((product, index) => (
-              <ProductCard key={index} product={product} />
+              <ProductCard
+                key={index}
+                product={product}
+                date_price_data={priceData[product.item.id] || []} // Pass unique price data for each product
+              />
             ))}
           </div>
         </div>
@@ -58,4 +63,13 @@ export default function TechPage() {
       )}
     </div>
   );
+}
+interface Product {
+  item: {
+    id: string; // Make sure there's an 'id' property for the product
+    itemImg: string;
+    currentBestPrice: number;
+    name: string;
+    modelNumber: string;
+  };
 }
