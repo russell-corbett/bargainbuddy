@@ -31,7 +31,6 @@ exports.getPrices = async (req, res) => {
   
 	  // Convert the object into the desired array format
 	  const formattedPrices = Object.values(prices);
-  
 	  // Send the response
 	  res.status(201).json({ Prices: formattedPrices });
 	} catch (error) {
