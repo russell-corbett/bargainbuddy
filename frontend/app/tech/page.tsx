@@ -1,49 +1,43 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { getSocket } from "../socket";
 import ProductCard from "../components/ProductCard/ProductCard";
+
+interface Product {
+  item: {
+    itemImg: string;
+    currentBestPrice: number;
+    name: string;
+    modelNumber: string;
+  };
+}
+
+interface userItemsResponse {
+  statusCode: number;
+  data: Product[] | { error: string };
+}
 
 export default function TechPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [priceData, setPriceData] = useState<{ [key: string]: any[] }>({}); // Store price data by product ID
 
+  const socket = getSocket();
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.post(
-          "http://localhost:3001/getUserItems",
-          {
-            email: "zrcoffey@mun.ca",
-          }
+    socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
+
+    socket.on("userItemsResponse", (response: userItemsResponse) => {
+      if (response.statusCode !== 200) {
+        console.error(
+          "Error fetching products:",
+          (response.data as { error: string }).error
         );
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
+      } else {
+        setProducts(response.data as Product[]);
       }
-
-      // Fetch price data for each product by its unique id
-      try {
-        for (const product of products) {
-          const response = await axios.post("http://localhost:3001/getPrices", {
-            id: product.item.id, // Use product's unique ID
-          });
-
-          // Check for BestBuy data in response and store it by product ID
-          if (response.data.Prices) {
-            setPriceData((prevData) => ({
-              ...prevData,
-              [product.item.id]: response.data.Prices, // Store date vs prices data by product ID
-            }));
-          }
-        }
-      } catch (error) {
-        console.error("Error getting price data:", error);
-      }
-    };
-
-    fetchProducts();
-  }, [products]); // Add products to dependencies to ensure the API is called after they are fetched
+    });
+  });
 
   return (
     <div className="min-h-screen p-8 bg-white">
@@ -70,7 +64,6 @@ export default function TechPage() {
     </div>
   );
 }
-
 interface Product {
   item: {
     id: string; // Make sure there's an 'id' property for the product
