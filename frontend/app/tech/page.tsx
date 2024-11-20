@@ -1,29 +1,42 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { getSocket } from "../socket";
 import ProductCard from "../components/ProductCard/ProductCard";
+
+interface Product {
+  item: {
+    itemImg: string;
+    currentBestPrice: number;
+    name: string;
+    modelNumber: string;
+  };
+}
+
+interface userItemsResponse {
+  statusCode: number;
+  data: Product[] | { error: string };
+}
 
 export default function TechPage() {
   const [products, setProducts] = useState<Product[]>([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.post(
-          "http://localhost:3001/getUserItems",
-          {
-            email: "zrcoffey@mun.ca",
-          }
-        );
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
+  const socket = getSocket();
 
-    fetchProducts();
-  }, []);
+  useEffect(() => {
+    socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
+
+    socket.on("userItemsResponse", (response: userItemsResponse) => {
+      if (response.statusCode !== 200) {
+        console.error(
+          "Error fetching products:",
+          (response.data as { error: string }).error
+        );
+      } else {
+        setProducts(response.data as Product[]);
+      }
+    });
+  });
 
   return (
     <div className="min-h-screen p-8 bg-white">
@@ -45,13 +58,4 @@ export default function TechPage() {
       )}
     </div>
   );
-}
-
-interface Product {
-  item: {
-    itemImg: string;
-    currentBestPrice: number;
-    name: string;
-    modelNumber: string;
-  };
 }

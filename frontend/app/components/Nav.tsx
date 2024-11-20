@@ -30,6 +30,7 @@ export default function Nav() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent page refresh on form submit
     socket.emit("addToWishlist", { modelNumber });
+    socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
     setModelNumber("");
     setIsSearchOpen(false);
     console.log("Form submitted with model number:", modelNumber);
