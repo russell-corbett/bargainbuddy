@@ -1,8 +1,8 @@
 // routes/productRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const ProductController = require('../controllers/productController');
+const ProductController = require("../controllers/productController");
 
-router.post('/search', ProductController.searchAndSaveProduct);
+router.post("/search", ProductController.searchAndSaveProduct);
 
 module.exports = router;

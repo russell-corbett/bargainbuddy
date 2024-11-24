@@ -2,10 +2,10 @@ const axios = require("axios");
 const crypto = require("crypto");
 
 class WalmartService {
-  constructor() {
-    this.consumerId = "7785b9a8-40f4-48ac-bb68-41b79eea5fd4"; 
-    this.privateKeyVersion = "1"; 
-    this.privateKey = `-----BEGIN RSA PRIVATE KEY-----
+	constructor() {
+		this.consumerId = "7785b9a8-40f4-48ac-bb68-41b79eea5fd4";
+		this.privateKeyVersion = "1";
+		this.privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAzSDv449f7LprTrz/2nKeAp+1dIaX/W94QdpRjcRW1wtwvQ1g
 grJXG/UfuCJ9yZElEKJHAxv9MbIC/nQPpyDD2JzFNqI3XQEpOctQp60ntYhnB6Jo
 pbZjiMAckuEV9KHpLMlFhpm8mpM+tpahUyX09MU+WeJBvxxK2ObviuHrqC7RiR3R
@@ -31,77 +31,70 @@ zZpEoGpXuLBttOvOuk1QffRRCEuJkiwTYUA6NJxZ18IPaXrYoW40aOFkRLyJTqBB
 UlOqwQKBgQCqAXtJE6YQ+/tulw1kEVv7JUstlWUV/+RGigCAs818jvDB2P6kVSPg
 emSm2DmoG/EmmhtQ+9yrAM+Hc8VDTmmyE7JazCeU1M/Y2AAxOG55kvON+Oa5abQE
 HJrTIa6Ellfue4yCBfcBuN/7a4xA8ogKJiwJrCgUcopPuvIpeOxaRA==
------END RSA PRIVATE KEY-----`; 
-  }
+-----END RSA PRIVATE KEY-----`;
+	}
 
-  generateSignature(consumerId, intimestamp, privateKeyVersion) {
-    const dataToSign = `${consumerId}\n${intimestamp}\n${privateKeyVersion}\n`;
-    const sign = crypto.createSign("RSA-SHA256");
-    sign.update(dataToSign);
-    sign.end();
-    const signature = sign.sign(this.privateKey, "base64");
-    return signature;
-  }
+	generateSignature(consumerId, intimestamp, privateKeyVersion) {
+		const dataToSign = `${consumerId}\n${intimestamp}\n${privateKeyVersion}\n`;
+		const sign = crypto.createSign("RSA-SHA256");
+		sign.update(dataToSign);
+		sign.end();
+		const signature = sign.sign(this.privateKey, "base64");
+		return signature;
+	}
 
-  async fetchData(url, identifier) {
-    const intimestamp = Date.now();
-    const signature = this.generateSignature(
-      this.consumerId,
-      intimestamp,
-      this.privateKeyVersion
-    );
+	async fetchData(url, identifier) {
+		const intimestamp = Date.now();
+		const signature = this.generateSignature(this.consumerId, intimestamp, this.privateKeyVersion);
 
-    const headers = {
-      "WM_CONSUMER.ID": this.consumerId,
-      "WM_CONSUMER.INTIMESTAMP": intimestamp,
-      "WM_SEC.KEY_VERSION": this.privateKeyVersion,
-      "WM_SEC.AUTH_SIGNATURE": signature,
-    };
+		const headers = {
+			"WM_CONSUMER.ID": this.consumerId,
+			"WM_CONSUMER.INTIMESTAMP": intimestamp,
+			"WM_SEC.KEY_VERSION": this.privateKeyVersion,
+			"WM_SEC.AUTH_SIGNATURE": signature,
+		};
 
-    try {
-      const response = await axios.get(url, {
-        headers: headers,
-        params: {
-          query: identifier, // Search by UPC or any other parameter
-          format: "json",
-        },
-        timeout: 10000,
-      });
+		try {
+			const response = await axios.get(url, {
+				headers: headers,
+				params: {
+					query: identifier, // Search by UPC or any other parameter
+					format: "json",
+				},
+				timeout: 10000,
+			});
 
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching data from Walmart API:", error.message);
-      console.error(
-        "Error details:",
-        error.response ? error.response.data : "No response data"
-      );
-      return null;
-    }
-  }
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching data from Walmart API:", error.message);
+			console.error("Error details:", error.response ? error.response.data : "No response data");
+			return null;
+		}
+	}
 
-  async searchWalmart(UPC) {
-    const productUrl = `https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items?upc=${UPC}`;
-    const productData = await this.fetchData(productUrl, UPC);
+	async searchWalmart(UPC) {
+		const productUrl = `https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items?upc=${UPC}`;
+		const productData = await this.fetchData(productUrl, UPC);
 
-    if (productData && productData.items && productData.items.length > 0) {
-      const product = productData.items[0]; // Get the first matching product
-      const productDetails = {
-        name: product.name,
-        sku: product.itemId,
-        price: product.salePrice,
-        productPicture: product.mediumImage,
-      };
+		if (productData && productData.items && productData.items.length > 0) {
+			const product = productData.items[0]; // Get the first matching product
+			const productDetails = {
+				name: product.name,
+				sku: product.itemId,
+				price: product.salePrice,
+				productPicture: product.mediumImage,
+			};
 
-      console.log(`Item Name: ${productDetails.name}`);
-      console.log(`Price: $${productDetails.price}`);
-      console.log(`Store Name: Walmart`);
-      console.log(`Image URL: ${productDetails.productPicture}`);
+			console.log(`Item Name: ${productDetails.name}`);
+			console.log(`Price: $${productDetails.price}`);
+			console.log(`Store Name: Walmart`);
+			console.log(`Image URL: ${productDetails.productPicture}`);
 
-      return productDetails;
-    } else {
-      throw new Error("Product information not found");
-    }
-  }
+			return productDetails;
+		} else {
+			throw new Error("Product information not found");
+		}
+	}
 }
 
 module.exports = WalmartService;
