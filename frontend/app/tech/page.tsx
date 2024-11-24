@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getSocket } from "../socket";
 import ProductCard from "../components/ProductCard/ProductCard";
 
+
 interface Product {
   item: {
     id: string; 
@@ -13,6 +14,9 @@ interface Product {
     modelNumber: string;
   };
 }
+
+
+
 
 interface userItemsResponse {
   statusCode: number;

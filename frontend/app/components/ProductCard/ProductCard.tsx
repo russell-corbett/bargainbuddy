@@ -6,7 +6,12 @@ import {
   faChartLine,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+
 import LineChartComponent from "./LineChartComponent";
+
+import Image from "next/image";
+import WalmartLogo from "../../srcImages/Walmart-Logo.wine.png";
+import BestBuyLogo from "../../srcImages/best-buy-logo.png";
 
 // Need this file to trust that this is the is the structure for DataPoint (defined in LineChartComponent)
 export interface DataPoint {
@@ -55,6 +60,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
     setBackContent(null);
   };
 
+  const getStoreLogo = () => {
+    // Temporary implementation: always return BestBuyLogo
+    return BestBuyLogo;
+
+    // Future implementation (when currentStore is available)
+    // if (product.item.currentStore === "Walmart") {
+    //   return WalmartLogo;
+    // } else if (product.item.currentStore === "BestBuy") {
+    //   return BestBuyLogo;
+    // }
+    // return BestBuyLogo;
+  };
+
+  const storeLogo = getStoreLogo();
+
   return (
     <div
       className={`${styles.productCard} w-80 h-[400px] relative bg-slate-50 rounded-xl border-neutral-200 shadow-lg hover:scale-105 duration-300`}
@@ -86,20 +106,34 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {/* Button Container */}
-            <div className="flex justify-end mt-4 space-x-3">
-              <button
-                className="bg-secondary text-white flex items-center justify-center p-2 rounded-full w-10 h-10 hover:scale-105 transition-all duration-300"
-                onClick={handlePriceTrendClick}
-              >
-                <FontAwesomeIcon icon={faChartLine} />
-              </button>
+            <div className="flex justify-between items-center mt-4 rounded-full">
+              {/* Store Logo */}
+              {storeLogo && (
+                <Image
+                  src={storeLogo}
+                  alt="Store Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain rounded-full"
+                />
+              )}
 
-              <button
-                className="bg-secondary text-white flex items-center justify-center p-2 rounded-full w-10 h-10 hover:scale-105 transition-all duration-300"
-                onClick={handleWishlistClick}
-              >
-                <FontAwesomeIcon icon={faPlus} />
-              </button>
+              {/* Buttons */}
+              <div className="flex space-x-3">
+                <button
+                  className="bg-secondary text-white flex items-center justify-center p-2 rounded-full w-10 h-10 hover:scale-105 transition-all duration-300"
+                  onClick={handlePriceTrendClick}
+                >
+                  <FontAwesomeIcon icon={faChartLine} />
+                </button>
+
+                <button
+                  className="bg-secondary text-white flex items-center justify-center p-2 rounded-full w-10 h-10 hover:scale-105 transition-all duration-300"
+                  onClick={handleWishlistClick}
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
