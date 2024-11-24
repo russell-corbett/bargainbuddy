@@ -13,6 +13,7 @@ const ProductSearch = require("./microServices/ProductSearchService");
 const axios = require("axios");
 
 const { getUserItems } = require(".//api/endpoints/user/userController");
+const { getPrices } = require(".//api/endpoints/price/priceController");
 
 const app = express();
 const port = 3001;
@@ -91,16 +92,48 @@ io.on("connection", (socket) => {
 					socket.emit("userItemsResponse", { statusCode: 200, data: response });
 				},
 			};
+      await getUserItems(req, res);
+    } catch (error) {
+      console.error("Socket Error:", error);
+      socket.emit("userItemsResponse", {
+        statusCode: 500,
+        data: { error: "An unexpected error occurred." },
+      });
+    }
+  });
 
-			await getUserItems(req, res);
-		} catch (error) {
-			console.error("Socket Error:", error);
-			socket.emit("userItemsResponse", {
-				statusCode: 500,
-				data: { error: "An unexpected error occurred." },
-			});
-		}
-	});
+  socket.on("getPrices", async (data) => {
+    try {
+      const req = { body: data }; // Mock the request object
+      const res = {
+        status: (statusCode) => ({
+          json: (response) => {
+            socket.emit("priceDataResponse", {
+              statusCode,
+              productId: data.id, // Pass back the product ID
+              prices: response.Prices || [],
+            });
+          },
+        }),
+        json: (response) => {
+          socket.emit("priceDataResponse", {
+            statusCode: 200,
+            productId: data.id, // Pass back the product ID
+            prices: response.Prices || [],
+          });
+        },
+      };
+  
+      await getPrices(req, res); // Call the `getPrices` function
+    } catch (error) {
+      console.error(`Error fetching prices for product ID ${data.id}:`, error);
+      socket.emit("priceDataResponse", {
+        statusCode: 500,
+        productId: data.id,
+        prices: [],
+      });
+    }
+  });
 });
 
 server.listen(port, () => {

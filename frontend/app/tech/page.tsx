@@ -5,12 +5,13 @@ import { getSocket } from "../socket";
 import ProductCard from "../components/ProductCard/ProductCard";
 
 interface Product {
-	item: {
-		itemImg: string;
-		currentBestPrice: number;
-		name: string;
-		modelNumber: string;
-	};
+  item: {
+    id: string; // Make sure there's an 'id' property for the product
+    itemImg: string;
+    currentBestPrice: number;
+    name: string;
+    modelNumber: string;
+  };
 }
 
 interface userItemsResponse {
@@ -18,23 +19,61 @@ interface userItemsResponse {
 	data: Product[] | { error: string };
 }
 
+interface PriceDataResponse {
+  statusCode: number;
+  productId: string;
+  prices: any[];
+}
+
 export default function TechPage() {
 	const [products, setProducts] = useState<Product[]>([]);
 	const [priceData, setPriceData] = useState<{ [key: string]: any[] }>({}); // Store price data by product ID
 
 	const socket = getSocket();
+  
+  useEffect(() => {
+    // Fetch user items
+    socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
 
-	useEffect(() => {
-		socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
+    socket.on("userItemsResponse", (response: userItemsResponse) => {
+      if (response.statusCode !== 200) {
+        console.error(
+          "Error fetching products:",
+          (response.data as { error: string }).error
+        );
+      } else {
+        const products = response.data as Product[];
+        setProducts(products);
 
-		socket.on("userItemsResponse", (response: userItemsResponse) => {
-			if (response.statusCode !== 200) {
-				console.error("Error fetching products:", (response.data as { error: string }).error);
-			} else {
-				setProducts(response.data as Product[]);
-			}
-		});
-	});
+        // Fetch price data for each product
+        products.forEach((product) => {
+          socket.emit("getPrices", { id: product.item.id });
+        });
+      }
+    });
+
+    // Listen for price data response
+    socket.on("priceDataResponse", (response: PriceDataResponse) => {
+      if (response.statusCode !== 201) {
+        console.log(priceData)
+        console.error(
+          `Error fetching price data for product ID ${response.productId}:`,
+          response
+        );
+      } else {
+        setPriceData((prevData) => ({
+          ...prevData,
+          [response.productId]: response.prices,
+        }));
+      }
+    });
+
+    // Clean up socket listeners on unmount
+    return () => {
+      socket.off("userItemsResponse");
+      socket.off("priceDataResponse");
+    };
+  }, [socket]);
 
 	return (
 		<div className="min-h-screen p-8 bg-white">
@@ -56,13 +95,4 @@ export default function TechPage() {
 			)}
 		</div>
 	);
-}
-interface Product {
-	item: {
-		id: string; // Make sure there's an 'id' property for the product
-		itemImg: string;
-		currentBestPrice: number;
-		name: string;
-		modelNumber: string;
-	};
 }
