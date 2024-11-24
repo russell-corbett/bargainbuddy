@@ -92,7 +92,7 @@ export default function Nav() {
 							<input type="text" value={modelNumber} onChange={(e) => setModelNumber(e.target.value)} className="flex-grow outline-none text-left text-black px-4 py-2 h-9 w-full rounded-l-full" placeholder={searchType === "model" ? "Search by Model Number..." : "Search by Product Name..."} />
 
 							{/* Filter Icon Inside the Search Bar */}
-							<button type="button" onClick={handleFilterClick} className="absolute right-0 text-lime-700 px-3 focus:outline-none">
+							<button type="button" onClick={handleFilterClick} className="absolute right-0 text-primary px-3 focus:outline-none">
 								<FontAwesomeIcon icon={faFilter} />
 							</button>
 						</div>

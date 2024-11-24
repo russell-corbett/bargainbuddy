@@ -84,7 +84,6 @@ export default function TechPage() {
       socket.off("priceDataResponse");
     };
   }, [socket]);
-
   return (
     <div className="min-h-screen p-8 bg-white">
       <h1 className="bg-white text-black dark:text-black text-4xl mt-1 font-serif border-b border-gray-200 pb-6">
