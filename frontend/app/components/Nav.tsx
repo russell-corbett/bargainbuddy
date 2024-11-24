@@ -142,7 +142,6 @@ export default function Nav() {
                     : "Search by Product Name..."
                 }
               />
-
               {/* Filter Icon Inside the Search Bar */}
               <button
                 type="button"
