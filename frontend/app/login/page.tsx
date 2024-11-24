@@ -1,5 +1,4 @@
 "use client";
-
 interface LoginResponse {
   error?: string;
   message?: string;

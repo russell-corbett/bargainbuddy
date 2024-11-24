@@ -7,10 +7,14 @@ const cors = require("cors");
 const Database = require("./database");
 const userRoutes = require("./api/endpoints/user/userRoutes");
 const itemRoutes = require("./api/endpoints/item/itemRoutes");
+const { connectUserItem } = require("./api/endpoints/user/userController");
+const { createItem } = require("./api/endpoints/item/itemController");
 const priceRoutes = require("./api/endpoints/price/priceRoutes");
 const trendRoutes = require("./api/endpoints/trend/trendRoutes");
-const BestBuyService = require("./microServices/BestBuyService"); // Corrected path
-const users = require("./api/endpoints/user/userController");
+const ProductSearch = require("./microServices/ProductSearchService");
+
+const { getUserItems } = require(".//api/endpoints/user/userController");
+const { getPrices } = require(".//api/endpoints/price/priceController");
 
 const app = express();
 const port = 3001;
@@ -89,7 +93,7 @@ let clientsConnected = 0;
 
 const db = Database;
 
-const bestBuyApiRef = new BestBuyService();
+const productSearch = new ProductSearch();
 
 // Enable CORS for all routes
 app.use(cors());
@@ -123,8 +127,61 @@ io.on("connection", (socket) => {
     console.log(`Client has disconnected ${socket.id}`);
   });
 
-  socket.on("addToWishlist", (data) => {
-    bestBuyApiRef.searchBestBuy(data.modelNumber);
+  socket.on("addToWishlist", async (data) => {
+    try {
+      product = await productSearch.searchProduct(
+        data.modelNumber,
+        "modelNumber"
+      );
+      // prisma.add(product, userToken)
+      const item_body = {
+        name: product[0].name,
+        modelNumber: data.modelNumber,
+        currentBestPrice: product[0].price,
+        itemImg: product[0].image,
+      };
+
+      const userItem_body = {
+        email: "zrcoffey@mun.ca",
+        modelNumber: data.modelNumber,
+      };
+
+      await createItem(
+        { body: item_body },
+        { status: () => ({ json: () => {} }) }
+      );
+      await connectUserItem(
+        { body: userItem_body },
+        { status: () => ({ json: () => {} }) }
+      );
+
+      socket.emit("newProductAdded", item_body);
+    } catch (error) {
+      console.error("Error in addToWishList", error);
+    }
+  });
+
+  socket.on("getUserItems", async (data) => {
+    try {
+      const req = { body: data };
+      const res = {
+        status: (statusCode) => ({
+          json: (response) => {
+            socket.emit("userItemsResponse", { statusCode, data: response });
+          },
+        }),
+        json: (response) => {
+          socket.emit("userItemsResponse", { statusCode: 200, data: response });
+        },
+      };
+      await getUserItems(req, res);
+    } catch (error) {
+      console.error("Socket Error:", error);
+      socket.emit("userItemsResponse", {
+        statusCode: 500,
+        data: { error: "An unexpected error occurred." },
+      });
+    }
   });
 
   socket.on("createUser", ({email, password, username}) => {
@@ -159,6 +216,38 @@ io.on("connection", (socket) => {
 //   socket.on("modelNumber", (data) => {
 //     console.log("ModelNumber event");
 //   });
+  socket.on("getPrices", async (data) => {
+    try {
+      const req = { body: data }; // Mock the request object
+      const res = {
+        status: (statusCode) => ({
+          json: (response) => {
+            socket.emit("priceDataResponse", {
+              statusCode,
+              productId: data.id, // Pass back the product ID
+              prices: response.Prices || [],
+            });
+          },
+        }),
+        json: (response) => {
+          socket.emit("priceDataResponse", {
+            statusCode: 200,
+            productId: data.id, // Pass back the product ID
+            prices: response.Prices || [],
+          });
+        },
+      };
+
+      await getPrices(req, res); // Call the `getPrices` function
+    } catch (error) {
+      console.error(`Error fetching prices for product ID ${data.id}:`, error);
+      socket.emit("priceDataResponse", {
+        statusCode: 500,
+        productId: data.id,
+        prices: [],
+      });
+    }
+  });
 });
 
 server.listen(port, () => {

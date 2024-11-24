@@ -12,10 +12,8 @@ FROM base as production
 
 ENV NODE_PATH=./build
 
-# Generate Prisma client
-RUN npx prisma generate
+RUN npm run build
 
-# Run migrations
 RUN npm run migrate
 
-CMD ["node", "index.js"]
+CMD ["node", "dist/app.js"]
