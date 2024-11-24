@@ -16,9 +16,6 @@ interface Product {
   };
 }
 
-
-
-
 interface userItemsResponse {
   statusCode: number;
   data: Product[] | { error: string };
@@ -65,6 +62,8 @@ export default function TechPage() {
         if (exists) return prevProducts;
         return [...prevProducts, { item: newProduct }];
       });
+      // Fetch price data for the new product
+      socket.emit("getPrices", { id: newProduct.id });
     });
 
     // Listen for price data response

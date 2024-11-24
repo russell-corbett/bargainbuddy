@@ -1,5 +1,5 @@
-require('dotenv').config();
-const jwt = require("jsonwebtoken")
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
@@ -20,74 +20,70 @@ const app = express();
 const port = 3001;
 const server = http.createServer(app);
 const io = socketIO(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+	cors: {
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST"],
+	},
 });
 
-
 const generateToken = (email) => {
-  return jwt.sign({ email }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+	return jwt.sign({ email }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
 };
 
-const loginUser = async ({email, password}) => {
-  try{
-    console.log("Logging in user:". email);
+const loginUser = async ({ email, password }) => {
+	try {
+		console.log("Logging in user:".email);
 
-    const user = await db.getRecord("user", { email });
-    if (!user){
-      throw new Error("No account associated with email")
-    }
-    
-    if (password != user.password){
-      throw new Error("Password incorrect")
-    }
+		const user = await db.getRecord("user", { email });
+		if (!user) {
+			throw new Error("No account associated with email");
+		}
 
-    const token = generateToken(email);
-    return token;
-  }
-  catch(error){
-    console.error("Error during login:", error);
-  }
+		if (password != user.password) {
+			throw new Error("Password incorrect");
+		}
+
+		const token = generateToken(email);
+		return token;
+	} catch (error) {
+		console.error("Error during login:", error);
+	}
 };
- 
+
 // Rewritten to not rely on HTTP res object
-const createUser = async ({ email, password, username}) => {
-  try {
-    console.log("Creating user with email:", email);
+const createUser = async ({ email, password, username }) => {
+	try {
+		console.log("Creating user with email:", email);
 
-    // Check if the user already exists in the database
-    const user = await db.getRecord("user", { email });
-    if (user) {
-      throw new Error("Email already exists");
-    }
+		// Check if the user already exists in the database
+		const user = await db.getRecord("user", { email });
+		if (user) {
+			throw new Error("Email already exists");
+		}
 
-    // Additional validation checks for email and password
-    if (!email.includes("@") || !email.includes(".")) {
-      throw new Error("Email is not valid");
-    }
+		// Additional validation checks for email and password
+		if (!email.includes("@") || !email.includes(".")) {
+			throw new Error("Email is not valid");
+		}
 
-    if (password.length < 8) {
-      throw new Error("Password is too short");
-    }
+		if (password.length < 8) {
+			throw new Error("Password is too short");
+		}
 
-    if (!password.match(/[A-Z]/)) {
-      throw new Error("Password does not contain a capital letter");
-    }
+		if (!password.match(/[A-Z]/)) {
+			throw new Error("Password does not contain a capital letter");
+		}
 
-    // Create the user in the database (assuming password is plain text for now)
-    const newUser = await db.createRecord("user", { email, password, username});
+		// Create the user in the database (assuming password is plain text for now)
+		const newUser = await db.createRecord("user", { email, password, username });
 
-    console.log("User created successfully:", newUser);
-    return newUser; // Return the newly created user or relevant response
-
-  } catch (error) {
-    console.error("Error during user creation:", error.message);
-    throw error; // Rethrow error if needed, or handle accordingly
-  }
+		console.log("User created successfully:", newUser);
+		return newUser; // Return the newly created user or relevant response
+	} catch (error) {
+		console.error("Error during user creation:", error.message);
+		throw error; // Rethrow error if needed, or handle accordingly
+	}
 };
-
 
 let clientsConnected = 0;
 
@@ -105,15 +101,15 @@ app.use(trendRoutes);
 
 // Close the database connection on server shutdown
 process.on("SIGINT", async () => {
-  await db.close();
-  server.close(() => {
-    console.log("Server closed");
-    process.exit(0);
-  });
+	await db.close();
+	server.close(() => {
+		console.log("Server closed");
+		process.exit(0);
+	});
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+	res.send("Hello World!");
 });
 
 io.on("connection", (socket) => {
@@ -126,20 +122,21 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("addToWishlist", async (data) => {
-    let type = null;
-    console.log(data.searchType)
-    if (data.searchType == "model") {
-      type = "modelnumber"
-    } else {
-      type = "upc"
-    }
-    console.log(type)
-    
+		let type = null;
+		console.log(data.searchType);
+		if (data.searchType == "model") {
+			type = "modelnumber";
+		} else {
+			type = "upc";
+		}
+		console.log(type);
+
 		product = await productSearch.searchProduct(data.query, type); //change "modelNumber" to searchType
 		// prisma.add(product, userToken)
 
 		let betterPrice = 0;
-		if(product[1]) { //found price from walmart and bestbuy
+		if (product[1]) {
+			//found price from walmart and bestbuy
 			if (product[0].price < product[1].price) {
 				betterPrice = 0;
 			} else {
@@ -151,7 +148,7 @@ io.on("connection", (socket) => {
 				modelNumber: product[betterPrice].modelNumber,
 				currentBestPrice: product[betterPrice].price,
 				itemImg: product[betterPrice].image,
-				currentStore: product[betterPrice].store
+				currentStore: product[betterPrice].store,
 			};
 
 			const userItem_body = {
@@ -162,31 +159,31 @@ io.on("connection", (socket) => {
 			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
 			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
 
-			itemId_ = await Database.getRecord("Item", {modelNumber: product[betterPrice].modelNumber});
+			itemId_ = await Database.getRecord("Item", { modelNumber: product[betterPrice].modelNumber });
 
 			const price_body_0 = {
 				store: product[0].store,
 				price: product[0].price,
 				itemId: itemId_.id,
-			}
+			};
 
 			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
 
 			const price_body_1 = {
 				store: product[1].store,
 				price: product[1].price,
-				itemId: itemId_.id
-			}
+				itemId: itemId_.id,
+			};
 
 			await addPrice({ body: price_body_1 }, { status: () => ({ json: () => {} }) });
-
+			socket.emit("newProductAdded", item_body);
 		} else if (product[0]) {
 			const item_body = {
 				name: product[0].name,
 				modelNumber: product[0].modelNumber,
 				currentBestPrice: product[0].price,
 				itemImg: product[0].image,
-				currentStore: product[0].store
+				currentStore: product[0].store,
 			};
 
 			const userItem_body = {
@@ -197,19 +194,20 @@ io.on("connection", (socket) => {
 			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
 			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
 
-			itemId_ = await Database.getRecord("Item", {modelNumber: product[0].modelNumber});
+			itemId_ = await Database.getRecord("Item", { modelNumber: product[0].modelNumber });
 
 			const price_body_0 = {
 				store: product[0].store,
 				price: product[0].price,
-				itemId: itemId_.id
-			}
+				itemId: itemId_.id,
+			};
 
 			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
-		}
-		else {
-      //if not product found
-			console.warn("Product not found.")
+
+			socket.emit("newProductAdded", item_body);
+		} else {
+			//if not product found
+			console.warn("Product not found.");
 		}
 	});
 
@@ -226,82 +224,80 @@ io.on("connection", (socket) => {
 					socket.emit("userItemsResponse", { statusCode: 200, data: response });
 				},
 			};
-      await getUserItems(req, res);
-    } catch (error) {
-      console.error("Socket Error:", error);
-      socket.emit("userItemsResponse", {
-        statusCode: 500,
-        data: { error: "An unexpected error occurred." },
-      });
-    }
-  });
+			await getUserItems(req, res);
+		} catch (error) {
+			console.error("Socket Error:", error);
+			socket.emit("userItemsResponse", {
+				statusCode: 500,
+				data: { error: "An unexpected error occurred." },
+			});
+		}
+	});
 
-  socket.on("createUser", ({email, password, username}) => {
-    console.log('hello');
-    createUser({email, password, username});
-  })
-  
-  socket.on("loginUser", ({email, password}) => {
-    console.log("Socket received log-in request");
-    loginUser({email, password});
-  })
+	socket.on("createUser", ({ email, password, username }) => {
+		console.log("hello");
+		createUser({ email, password, username });
+	});
 
-  socket.on("loginUser", ({email, password}) => {
-    console.log("Socket received log-in request");
-    const token = loginUser({email, password});
-    if (token){
-      try{
-        console.log("User found, and logged in")
-        socket.emit("loginResponse", {
-        message: "Log-in attempt successful.",
-        token
-      })
-      }
-      catch(error)
-      {
-        console.log("Error logging in user.");
-        socket.emit("loginResponse", {error: "An error has occurred during login."});
-      }
-    }
-  })
+	socket.on("loginUser", ({ email, password }) => {
+		console.log("Socket received log-in request");
+		loginUser({ email, password });
+	});
 
-//   socket.on("modelNumber", (data) => {
-//     console.log("ModelNumber event");
-//   });
-  socket.on("getPrices", async (data) => {
-    try {
-      const req = { body: data }; // Mock the request object
-      const res = {
-        status: (statusCode) => ({
-          json: (response) => {
-            socket.emit("priceDataResponse", {
-              statusCode,
-              productId: data.id, // Pass back the product ID
-              prices: response.Prices || [],
-            });
-          },
-        }),
-        json: (response) => {
-          socket.emit("priceDataResponse", {
-            statusCode: 200,
-            productId: data.id, // Pass back the product ID
-            prices: response.Prices || [],
-          });
-        },
-      };
+	socket.on("loginUser", ({ email, password }) => {
+		console.log("Socket received log-in request");
+		const token = loginUser({ email, password });
+		if (token) {
+			try {
+				console.log("User found, and logged in");
+				socket.emit("loginResponse", {
+					message: "Log-in attempt successful.",
+					token,
+				});
+			} catch (error) {
+				console.log("Error logging in user.");
+				socket.emit("loginResponse", { error: "An error has occurred during login." });
+			}
+		}
+	});
 
-      await getPrices(req, res); // Call the `getPrices` function
-    } catch (error) {
-      console.error(`Error fetching prices for product ID ${data.id}:`, error);
-      socket.emit("priceDataResponse", {
-        statusCode: 500,
-        productId: data.id,
-        prices: [],
-      });
-    }
-  });
+	//   socket.on("modelNumber", (data) => {
+	//     console.log("ModelNumber event");
+	//   });
+	socket.on("getPrices", async (data) => {
+		try {
+			const req = { body: data }; // Mock the request object
+			const res = {
+				status: (statusCode) => ({
+					json: (response) => {
+						socket.emit("priceDataResponse", {
+							statusCode,
+							productId: data.id, // Pass back the product ID
+							prices: response.Prices || [],
+						});
+					},
+				}),
+				json: (response) => {
+					socket.emit("priceDataResponse", {
+						statusCode: 200,
+						productId: data.id, // Pass back the product ID
+						prices: response.Prices || [],
+					});
+				},
+			};
+
+			await getPrices(req, res); // Call the `getPrices` function
+		} catch (error) {
+			console.error(`Error fetching prices for product ID ${data.id}:`, error);
+			socket.emit("priceDataResponse", {
+				statusCode: 500,
+				productId: data.id,
+				prices: [],
+			});
+		}
+	});
 });
 
 server.listen(port, () => {
-  console.log("Server is listening.");
+	console.log("Server is listening.");
 });
