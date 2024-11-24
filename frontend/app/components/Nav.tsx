@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { getSocket } from "../socket";
-import { io } from "socket.io-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
@@ -19,22 +18,22 @@ import {
 const socket = getSocket();
 
 export default function Nav() {
-  const [modelNumber, setModelNumber] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  // Redesign added functions
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleDropdown = () => setIsOpen(!isOpen);
-  const [searchType, setSearchType] = useState("model");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+	const [query, setModelNumber] = useState("");
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
+	// Redesign added functions
+	const [isOpen, setIsOpen] = useState(false);
+	const toggleDropdown = () => setIsOpen(!isOpen);
+	const [searchType, setSearchType] = useState("model");
+	const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent page refresh on form submit
-    socket.emit("addToWishlist", { modelNumber });
-    socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
-    setModelNumber("");
-    setIsSearchOpen(false);
-    console.log("Form submitted with model number:", modelNumber);
-  };
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault(); // Prevent page refresh on form submit
+		socket.emit("addToWishlist", { query, searchType });
+		socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
+		setModelNumber("");
+		setIsSearchOpen(false);
+		console.log("Form submitted with query and type:", query, searchType);
+	};
 
   const handleSearchButtonClick = () => {
     if (isSearchOpen) {
@@ -119,7 +118,6 @@ export default function Nav() {
           Buddy
         </span>
       </div>
-
       {/* Right Side: Search with Filter */}
       <div className="relative flex items-center h-auto space-x-4 w-full md:w-auto mt-4 md:mt-0 justify-center md:flex-nowrap z-10 overflow-visible">
         {isSearchOpen && (
@@ -133,7 +131,7 @@ export default function Nav() {
             <div className="flex items-center w-72 h-10">
               <input
                 type="text"
-                value={modelNumber}
+                value={query}
                 onChange={(e) => setModelNumber(e.target.value)}
                 className="flex-grow outline-none text-left text-black px-4 py-2 h-9 rounded-l-full"
                 placeholder={
@@ -151,8 +149,6 @@ export default function Nav() {
                 <FontAwesomeIcon icon={faFilter} />
               </button>
             </div>
-
-
           </form>
         )}
 

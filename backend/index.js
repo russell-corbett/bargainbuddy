@@ -14,7 +14,7 @@ const trendRoutes = require("./api/endpoints/trend/trendRoutes");
 const ProductSearch = require("./microServices/ProductSearchService");
 
 const { getUserItems } = require(".//api/endpoints/user/userController");
-const { getPrices } = require(".//api/endpoints/price/priceController");
+const { getPrices, addPrice } = require(".//api/endpoints/price/priceController");
 
 const app = express();
 const port = 3001;
@@ -117,63 +117,105 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  clientsConnected++;
-  console.log(
-    `New client connected ${socket.id}. Total Clients Connected: ${clientsConnected}`
-  );
+	clientsConnected++;
+	console.log(`New client connected ${socket.id}. Total Clients Connected: ${clientsConnected}`);
 
-  socket.on("disconnect", () => {
-    clientsConnected--;
-    console.log(`Client has disconnected ${socket.id}`);
-  });
+	socket.on("disconnect", () => {
+		clientsConnected--;
+		console.log(`Client has disconnected ${socket.id}`);
+	});
 
-  socket.on("addToWishlist", async (data) => {
-    try {
-      product = await productSearch.searchProduct(
-        data.modelNumber,
-        "modelNumber"
-      );
-      // prisma.add(product, userToken)
-      const item_body = {
-        name: product[0].name,
-        modelNumber: data.modelNumber,
-        currentBestPrice: product[0].price,
-        itemImg: product[0].image,
-      };
+	socket.on("addToWishlist", async (data) => {
+		product = await productSearch.searchProduct(data.query, "modelnumber"); //change "modelNumber" to searchType
+		// prisma.add(product, userToken)
 
-      const userItem_body = {
-        email: "zrcoffey@mun.ca",
-        modelNumber: data.modelNumber,
-      };
+		let betterPrice = 0;
+		if(product[1]) { //found price from walmart and bestbuy
+			if (product[0].price < product[1].price) {
+				betterPrice = 0;
+			} else {
+				betterPrice = 1;
+			}
 
-      await createItem(
-        { body: item_body },
-        { status: () => ({ json: () => {} }) }
-      );
-      await connectUserItem(
-        { body: userItem_body },
-        { status: () => ({ json: () => {} }) }
-      );
+			const item_body = {
+				name: product[betterPrice].name,
+				modelNumber: product[betterPrice].modelNumber,
+				currentBestPrice: product[betterPrice].price,
+				itemImg: product[betterPrice].image,
+				currentStore: product[betterPrice].store
+			};
 
-      socket.emit("newProductAdded", item_body);
-    } catch (error) {
-      console.error("Error in addToWishList", error);
-    }
-  });
+			const userItem_body = {
+				email: "zrcoffey@mun.ca",
+				modelNumber: data.modelNumber,
+			};
 
-  socket.on("getUserItems", async (data) => {
-    try {
-      const req = { body: data };
-      const res = {
-        status: (statusCode) => ({
-          json: (response) => {
-            socket.emit("userItemsResponse", { statusCode, data: response });
-          },
-        }),
-        json: (response) => {
-          socket.emit("userItemsResponse", { statusCode: 200, data: response });
-        },
-      };
+			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
+			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
+
+			itemId_ = await Database.getRecord("Item", {modelNumber: product[betterPrice].modelNumber});
+
+			const price_body_0 = {
+				store: product[0].store,
+				price: product[0].price,
+				itemId: itemId_.id,
+			}
+
+			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
+
+			const price_body_1 = {
+				store: product[1].store,
+				price: product[1].price,
+				itemId: itemId_.id
+			}
+
+			await addPrice({ body: price_body_1 }, { status: () => ({ json: () => {} }) });
+
+		} else if (product[0]) {
+			const item_body = {
+				name: product[0].name,
+				modelNumber: product[0].modelNumber,
+				currentBestPrice: product[0].price,
+				itemImg: product[0].image,
+				currentStore: product[0].store
+			};
+
+			const userItem_body = {
+				email: "zrcoffey@mun.ca",
+				modelNumber: data.modelNumber,
+			};
+
+			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
+			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
+
+			itemId_ = await Database.getRecord("Item", {modelNumber: product[0].modelNumber});
+
+			const price_body_0 = {
+				store: product[0].store,
+				price: product[0].price,
+				itemId: itemId_.id
+			}
+
+			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
+		}
+		else {
+			console.warn("Product not found.")
+		}
+	});
+
+	socket.on("getUserItems", async (data) => {
+		try {
+			const req = { body: data };
+			const res = {
+				status: (statusCode) => ({
+					json: (response) => {
+						socket.emit("userItemsResponse", { statusCode, data: response });
+					},
+				}),
+				json: (response) => {
+					socket.emit("userItemsResponse", { statusCode: 200, data: response });
+				},
+			};
       await getUserItems(req, res);
     } catch (error) {
       console.error("Socket Error:", error);
