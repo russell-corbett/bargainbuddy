@@ -15,7 +15,7 @@ export default function RootLayout({
   // Render the Nav for all routes except for the root ('/')
   const showGlobalNav =
     pathname !== "/" && pathname != "/home" && pathname != "/accountSignIn";
-  const excludeGlobals = pathname === "/home";
+  const excludeGlobals = pathname === "/home" || pathname === "/";
 
   return (
     <html lang="en">
