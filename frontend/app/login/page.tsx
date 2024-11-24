@@ -1,75 +1,74 @@
 "use client";
 
+interface LoginResponse {
+  error?: string;
+  message?: string;
+  user?: {
+    id: number;
+    email: string;
+  };
+  token: string;
+}
+
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../../firebaseConfig.js';
+import { getSocket } from "../socket";
+import { useNavigate } from 'react-router-dom'; //May need depending on how our routing works
 
 const LoginPage = () => {
+  const socket = getSocket(); // Get the socket instance
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginMessage, setLoginMessage] = useState('');
-  //const navigate = useNavigate(); // Initialize navigate function
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setLoginMessage('');
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setLoading(true);
+      setError('');
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Logged in:', userCredential.user);
-      setLoginMessage(`Logged in as user: ${userCredential.user.email}`); // Set login message
+      // Emit login request to the server using Socket.IO
+      socket.emit('loginUser', { email, password });
 
-      // Store user login status in local storage
-      localStorage.setItem('isLoggedIn', 'true'); // Change this to whatever identifier you'd like
-      localStorage.setItem('userEmail', userCredential.user.email!);
+      // Listen for the server response
+      socket.on('loginResponse', (response: LoginResponse) => {
+          setLoading(false);
 
-      // Redirect to homepage after successful login
-      //navigate('/'); // Replace with your homepage route
-    } catch (error: unknown) {
-      console.error('Login error:', error);
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError('An unexpected error occurred.');
-      }
-    } finally {
-      setLoading(false);
-    }
+          if (response.error) {
+              setError(response.error);
+          } else {
+              console.log('Login successful:', response.user);
+              //Set token to user's token
+              localStorage.setItem('token', response.token);
+              // navigate using navigate('') to tech.tsx
+          }
+      });
   };
 
   return (
     <div>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </form>
-      {loginMessage && (
-        <p style={{ color: 'green', fontWeight: 'bold', marginTop: '10px' }}>
-          {loginMessage}
-        </p>
-      )}
+        <h1>Login</h1>
+        <form onSubmit={handleLogin}>
+            <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+            />
+            <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+            />
+            <button type="submit" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+            </button>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+        </form>
     </div>
-  );
+);
 };
 
 export default LoginPage;
