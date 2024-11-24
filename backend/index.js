@@ -126,7 +126,16 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("addToWishlist", async (data) => {
-		product = await productSearch.searchProduct(data.query, "modelnumber"); //change "modelNumber" to searchType
+    let type = null;
+    console.log(data.searchType)
+    if (data.searchType == "model") {
+      type = "modelnumber"
+    } else {
+      type = "upc"
+    }
+    console.log(type)
+    
+		product = await productSearch.searchProduct(data.query, type); //change "modelNumber" to searchType
 		// prisma.add(product, userToken)
 
 		let betterPrice = 0;
@@ -147,7 +156,7 @@ io.on("connection", (socket) => {
 
 			const userItem_body = {
 				email: "zrcoffey@mun.ca",
-				modelNumber: data.modelNumber,
+				modelNumber: item_body.modelNumber,
 			};
 
 			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
@@ -182,7 +191,7 @@ io.on("connection", (socket) => {
 
 			const userItem_body = {
 				email: "zrcoffey@mun.ca",
-				modelNumber: data.modelNumber,
+				modelNumber: item_body.modelNumber,
 			};
 
 			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
@@ -199,6 +208,7 @@ io.on("connection", (socket) => {
 			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
 		}
 		else {
+      //if not product found
 			console.warn("Product not found.")
 		}
 	});

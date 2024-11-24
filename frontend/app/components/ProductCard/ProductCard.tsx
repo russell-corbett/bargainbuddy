@@ -25,6 +25,7 @@ interface ProductItem {
   currentBestPrice: number;
   name: string;
   modelNumber: string;
+  currentStore: string;
 }
 
 interface Product {
@@ -61,16 +62,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const getStoreLogo = () => {
-    // Temporary implementation: always return BestBuyLogo
-    return BestBuyLogo;
+    // // Temporary implementation: always return BestBuyLogo
+    // return BestBuyLogo;
 
     // Future implementation (when currentStore is available)
-    // if (product.item.currentStore === "Walmart") {
-    //   return WalmartLogo;
-    // } else if (product.item.currentStore === "BestBuy") {
-    //   return BestBuyLogo;
-    // }
-    // return BestBuyLogo;
+    if (product.item.currentStore === "walmart") {
+      return WalmartLogo;
+    } else if (product.item.currentStore === "BestBuy") {
+      return BestBuyLogo;
+    }
+    return BestBuyLogo;
   };
 
   const storeLogo = getStoreLogo();

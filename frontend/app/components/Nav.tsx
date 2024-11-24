@@ -194,12 +194,12 @@ export default function Nav() {
                         searchType === "product" ? faCheckCircle : faCircle
                       }
                       className={`mr-2 ${
-                        searchType === "product"
+                        searchType === "upc"
                           ? "text-dark"
                           : "text-white text-bold border rounded-full border-dark"
                       }`}
                     />
-                    Product Name
+                    UPC
                   </li>
                 </ul>
               </div>

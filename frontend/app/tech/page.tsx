@@ -12,6 +12,7 @@ interface Product {
     currentBestPrice: number;
     name: string;
     modelNumber: string;
+    currentStore: string;
   };
 }
 
