@@ -1,3 +1,5 @@
+require('dotenv').config();
+const jwt = require("jsonwebtoken")
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
@@ -10,7 +12,6 @@ const { createItem } = require("./api/endpoints/item/itemController");
 const priceRoutes = require("./api/endpoints/price/priceRoutes");
 const trendRoutes = require("./api/endpoints/trend/trendRoutes");
 const ProductSearch = require("./microServices/ProductSearchService");
-const axios = require("axios");
 
 const { getUserItems } = require(".//api/endpoints/user/userController");
 const { getPrices, addPrice } = require(".//api/endpoints/price/priceController");
@@ -19,11 +20,74 @@ const app = express();
 const port = 3001;
 const server = http.createServer(app);
 const io = socketIO(server, {
-	cors: {
-		origin: "http://localhost:3000",
-		methods: ["GET", "POST"],
-	},
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
+
+
+const generateToken = (email) => {
+  return jwt.sign({ email }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+};
+
+const loginUser = async ({email, password}) => {
+  try{
+    console.log("Logging in user:". email);
+
+    const user = await db.getRecord("user", { email });
+    if (!user){
+      throw new Error("No account associated with email")
+    }
+    
+    if (password != user.password){
+      throw new Error("Password incorrect")
+    }
+
+    const token = generateToken(email);
+    return token;
+  }
+  catch(error){
+    console.error("Error during login:", error);
+  }
+};
+ 
+// Rewritten to not rely on HTTP res object
+const createUser = async ({ email, password, username}) => {
+  try {
+    console.log("Creating user with email:", email);
+
+    // Check if the user already exists in the database
+    const user = await db.getRecord("user", { email });
+    if (user) {
+      throw new Error("Email already exists");
+    }
+
+    // Additional validation checks for email and password
+    if (!email.includes("@") || !email.includes(".")) {
+      throw new Error("Email is not valid");
+    }
+
+    if (password.length < 8) {
+      throw new Error("Password is too short");
+    }
+
+    if (!password.match(/[A-Z]/)) {
+      throw new Error("Password does not contain a capital letter");
+    }
+
+    // Create the user in the database (assuming password is plain text for now)
+    const newUser = await db.createRecord("user", { email, password, username});
+
+    console.log("User created successfully:", newUser);
+    return newUser; // Return the newly created user or relevant response
+
+  } catch (error) {
+    console.error("Error during user creation:", error.message);
+    throw error; // Rethrow error if needed, or handle accordingly
+  }
+};
+
 
 let clientsConnected = 0;
 
@@ -41,15 +105,15 @@ app.use(trendRoutes);
 
 // Close the database connection on server shutdown
 process.on("SIGINT", async () => {
-	await db.close();
-	server.close(() => {
-		console.log("Server closed");
-		process.exit(0);
-	});
+  await db.close();
+  server.close(() => {
+    console.log("Server closed");
+    process.exit(0);
+  });
 });
 
 app.get("/", (req, res) => {
-	res.send("Hello World!");
+  res.send("Hello World!");
 });
 
 io.on("connection", (socket) => {
@@ -162,6 +226,38 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("createUser", ({email, password, username}) => {
+    console.log('hello');
+    createUser({email, password, username});
+  })
+  
+  socket.on("loginUser", ({email, password}) => {
+    console.log("Socket received log-in request");
+    loginUser({email, password});
+  })
+
+  socket.on("loginUser", ({email, password}) => {
+    console.log("Socket received log-in request");
+    const token = loginUser({email, password});
+    if (token){
+      try{
+        console.log("User found, and logged in")
+        socket.emit("loginResponse", {
+        message: "Log-in attempt successful.",
+        token
+      })
+      }
+      catch(error)
+      {
+        console.log("Error logging in user.");
+        socket.emit("loginResponse", {error: "An error has occurred during login."});
+      }
+    }
+  })
+
+//   socket.on("modelNumber", (data) => {
+//     console.log("ModelNumber event");
+//   });
   socket.on("getPrices", async (data) => {
     try {
       const req = { body: data }; // Mock the request object
@@ -183,7 +279,7 @@ io.on("connection", (socket) => {
           });
         },
       };
-  
+
       await getPrices(req, res); // Call the `getPrices` function
     } catch (error) {
       console.error(`Error fetching prices for product ID ${data.id}:`, error);
@@ -197,5 +293,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-	console.log("Server is listening.");
+  console.log("Server is listening.");
 });

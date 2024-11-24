@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import { getSocket } from "../socket";
 import ProductCard from "../components/ProductCard/ProductCard";
 
+
 interface Product {
   item: {
-    id: string; // Make sure there's an 'id' property for the product
+    id: string; 
     itemImg: string;
     currentBestPrice: number;
     name: string;
@@ -14,9 +15,12 @@ interface Product {
   };
 }
 
+
+
+
 interface userItemsResponse {
-	statusCode: number;
-	data: Product[] | { error: string };
+  statusCode: number;
+  data: Product[] | { error: string };
 }
 
 interface PriceDataResponse {
@@ -26,11 +30,11 @@ interface PriceDataResponse {
 }
 
 export default function TechPage() {
-	const [products, setProducts] = useState<Product[]>([]);
-	const [priceData, setPriceData] = useState<{ [key: string]: any[] }>({}); // Store price data by product ID
+  const [products, setProducts] = useState<Product[]>([]);
+  const [priceData, setPriceData] = useState<{ [key: string]: any[] }>({}); // Store price data by product ID
 
-	const socket = getSocket();
-  
+  const socket = getSocket();
+
   useEffect(() => {
     // Fetch user items
     socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
@@ -52,10 +56,20 @@ export default function TechPage() {
       }
     });
 
+    socket.on("newProductAdded", (newProduct: Product["item"]) => {
+      setProducts((prevProducts) => {
+        const exists = prevProducts.some(
+          (product) => product.item.modelNumber === newProduct.modelNumber
+        );
+        if (exists) return prevProducts;
+        return [...prevProducts, { item: newProduct }];
+      });
+    });
+
     // Listen for price data response
     socket.on("priceDataResponse", (response: PriceDataResponse) => {
       if (response.statusCode !== 201) {
-        console.log(priceData)
+        console.log(priceData);
         console.error(
           `Error fetching price data for product ID ${response.productId}:`,
           response
@@ -74,7 +88,6 @@ export default function TechPage() {
       socket.off("priceDataResponse");
     };
   }, [socket]);
-
 	return (
 		<div className="min-h-screen p-8 bg-white">
 			<h1 className="bg-white text-black dark:text-black text-4xl mt-1 font-serif border-b border-gray-200 pb-6">Technology</h1>
