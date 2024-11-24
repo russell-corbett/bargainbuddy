@@ -1,7 +1,6 @@
 import React from "react";
 import { IoMdMenu } from "react-icons/io";
 import { motion } from "framer-motion";
-import styles from "./LandingPage.module.css";
 import Link from "next/link";
 
 const NavbarMenu = [
@@ -12,23 +11,13 @@ const NavbarMenu = [
 	},
 	{
 		id: 2,
-		title: "Services",
-		link: "#",
-	},
-	{
-		id: 3,
-		title: "About Us",
-		link: "#",
+		title: "Our Team",
+		path: "/team",
 	},
 	{
 		id: 4,
-		title: "Our Team",
-		link: "#",
-	},
-	{
-		id: 5,
 		title: "Contact Us",
-		link: "#",
+		path: "/contact",
 	},
 ];
 const Navbar = () => {
