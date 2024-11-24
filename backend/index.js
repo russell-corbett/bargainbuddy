@@ -1,5 +1,5 @@
 require('dotenv').config();
-const jwt = require("jwt")
+const jwt = require("jsonwebtoken")
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
