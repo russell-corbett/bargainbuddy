@@ -7,14 +7,7 @@ class BestBuyService {
 
   async fetchData(url) {
     try {
-      const response = await axios.get(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-          'Accept-Language': 'en-CA,en;q=0.9',
-          'Accept': 'application/json',
-          'Connection': 'keep-alive',
-        },
-      });
+      const response = await axios.get(url, { timeout: 10000 });
       return response.data;
     } catch (error) {
       console.error('Error fetching data from BestBuy:', error.message);
@@ -40,7 +33,6 @@ class BestBuyService {
         default:
           throw new Error(`Invalid search type: ${searchType}`);
       }
-
       return productDetails;
     } catch (error) {
       console.error('Error in searchBestBuy:', error.message);
@@ -73,7 +65,7 @@ class BestBuyService {
   }
 
   async fetchProductByName(productName) {
-    const url = `https://api.bestbuy.com/v1/products((search=${encodeURIComponent(productName)}))?apiKey=${this.apiKey}&sort=name.asc&show=sku,name,salePrice,image,url,modelNumber,upc&format=json`;
+    const url = `https://api.bestbuy.com/v1/products((search=${encodeURIComponent(productName)}))?apiKey=${this.apiKey}&sort=name.asc&show=sku,name,salePrice,image,url,modelNumber&format=json`;
     const data = await this.fetchData(url);
 
     if (data && data.products && data.products.length > 0) {
@@ -83,7 +75,7 @@ class BestBuyService {
       return null;
     }
   }
-  
+
   formatProductDetails(product) {
     return {
       store: 'BestBuy', // Added store name

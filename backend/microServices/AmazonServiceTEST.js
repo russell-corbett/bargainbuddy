@@ -2,7 +2,7 @@ const AmazonService = require('./AmazonService');
 
 async function testAmazonService() {
   const amazonService = new AmazonService();
-  const productName = 'Laptop Lenovo Yoga 370';
+  const productName = 'Lenovo ThinkPad L13 Yoga 13.3" Touchscreen FHD 2-in-1 Business Laptop,';
 
   try {
     const result = await amazonService.searchAmazon(productName);

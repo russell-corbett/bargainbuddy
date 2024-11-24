@@ -2,10 +2,11 @@ const BestBuyService = require('./BestBuyService');
 
 async function testBestBuyService() {
   const bestBuyService = new BestBuyService();
-  const productName = 'Laptop Lenovo Yoga';
-  const searchType = 'productName'; // You can change this to 'upc' or 'modelNumber' as needed
+  const productName = '600603167720';
+  const searchType = 'upc'; // You can change this to 'upc' or 'modelNumber' as needed
 
   try {
+    console.log(`Searching for product: ${productName} with search type: ${searchType}`);
     const result = await bestBuyService.searchBestBuy(productName, searchType);
     console.log('Search Result:', result);
   } catch (error) {

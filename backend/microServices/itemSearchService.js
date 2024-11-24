@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const ProductSearchLogic = require('./ProductSearchLogic');
-a
+
 class ItemSearchService {
   constructor() {
     this.searchService = new ProductSearchLogic();
