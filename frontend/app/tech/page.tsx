@@ -6,7 +6,7 @@ import ProductCard from "../components/ProductCard/ProductCard";
 
 interface Product {
   item: {
-    id: string; // Make sure there's an 'id' property for the product
+    id: string; 
     itemImg: string;
     currentBestPrice: number;
     name: string;
