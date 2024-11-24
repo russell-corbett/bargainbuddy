@@ -1,55 +1,62 @@
-// services/ProductSearchService.js
-const AmazonService = require("./AmazonService");
-const BestBuyService = require("./BestBuyService");
-const WalmartService = require("./WalmartService");
-const EbayService = require("./EbayService");
+const AmazonService = require('./AmazonService');
+const BestBuyService = require('./BestBuyService');
+const WalmartService = require('./WalmartService');
+const EbayService = require('./EbayService');
 
-class ProductSearchService {
-	constructor() {
-		this.amazonService = new AmazonService();
-		this.bestBuyService = new BestBuyService();
-		this.walmartService = new WalmartService();
-		this.ebayService = new EbayService();
-	}
+class ProductSearchLogic {
+  constructor() {
+    this.amazonService = new AmazonService();
+    this.bestBuyService = new BestBuyService();
+    this.walmartService = new WalmartService();
+    this.ebayService = new EbayService();
+  }
 
-	async searchProduct(query, type) {
-		let productName = null;
-		let bestBuyResult = null;
-		let walmartResult = null;
+  async searchProduct(query, type) {
+    let bestBuyResult = null;
+    let walmartResult = null;
+	  let productUPC = null;
+    let productModelNumber = null;
 
-		// Try to get product name from BestBuy
-		bestBuyResult = await this.bestBuyService.searchBestBuy(query, type);
-		if (bestBuyResult && bestBuyResult.name) {
-			productName = bestBuyResult.name;
-		}
+    let formattedType = type.toLowerCase();
 
-		// // If no product name from BestBuy, try Walmart
-		// if (!productName) {
-		//   walmartResult = await this.walmartService.searchWalmart(query);
-		//   if (walmartResult && walmartResult.name) {
-		//     productName = walmartResult.name;
-		//   }
-		// }
+    // try Walmart
+    walmartResult = await this.walmartService.searchWalmart(query, formattedType);
+    if (walmartResult && walmartResult.name) {
+      productUPC = walmartResult.upc;
+      productModelNumber = walmartResult.modelNumber;
 
-		// // If still no product name, assume query is a product name
-		// if (!productName) {
-		//   productName = query;
-		// }
+      if (productUPC) {
+        bestBuyResult = await this.bestBuyService.searchBestBuy(productUPC, "upc");
+      }
+      if (!bestBuyResult && productModelNumber) {
+        bestBuyResult = await this.bestBuyService.searchBestBuy(productModelNumber, "modelnumber");
+      }
+    }
 
-		// // Search Amazon and eBay using the product name
-		// const [amazonResult, ebayResult] = await Promise.all([
-		//   this.amazonService.searchAmazon(productName),
-		//   this.ebayService.searchEbay(productName),
-		// ]);
+    // Try to get product name from BestBuy
+    if (!bestBuyResult) {
+      bestBuyResult = await this.bestBuyService.searchBestBuy(query, formattedType);
+      if (bestBuyResult && bestBuyResult.name) {
+        productUPC = bestBuyResult.upc;
+        productModelNumber = bestBuyResult.modelNumber;
 
-		const results = [];
+        if (!walmartResult) {
+          if (productUPC) {
+            walmartResult = await this.walmartService.searchWalmart(productUPC, "upc");
+          }
+          if (productModelNumber) {
+            walmartResult = await this.walmartService.searchWalmart(productModelNumber, "modelnumber");
+          }
+        }
+      }
+    }
 
-		if (bestBuyResult) results.push({ store: "BestBuy", ...bestBuyResult });
-		// if (walmartResult) results.push({ store: 'Walmart', ...walmartResult });
-		// if (amazonResult) results.push({ store: 'Amazon', ...amazonResult });
-		// if (ebayResult) results.push({ store: 'eBay', ...ebayResult });
-		return results;
-	}
+    const results = [];
+
+    if (bestBuyResult) results.push({ store: 'bestbuy', ...bestBuyResult });
+    if (walmartResult) results.push({ store: 'walmart', ...walmartResult });
+    return results;
+  }
 }
 
-module.exports = ProductSearchService;
+module.exports = ProductSearchLogic;

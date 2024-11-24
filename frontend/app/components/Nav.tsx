@@ -2,14 +2,13 @@
 
 import React, { useState } from "react";
 import { getSocket } from "../socket";
-import { io } from "socket.io-client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faBasketShopping, faMicrochip, faGear, faMagnifyingGlass, faBars, faFilter, faCheckCircle, faCircle } from "@fortawesome/free-solid-svg-icons";
 
 const socket = getSocket();
 
 export default function Nav() {
-	const [modelNumber, setModelNumber] = useState("");
+	const [query, setModelNumber] = useState("");
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	// Redesign added functions
 	const [isOpen, setIsOpen] = useState(false);
@@ -19,11 +18,11 @@ export default function Nav() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault(); // Prevent page refresh on form submit
-		socket.emit("addToWishlist", { modelNumber });
+		socket.emit("addToWishlist", { query, searchType });
 		socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
 		setModelNumber("");
 		setIsSearchOpen(false);
-		console.log("Form submitted with model number:", modelNumber);
+		console.log("Form submitted with query and type:", query, searchType);
 	};
 
 	const handleSearchButtonClick = () => {
@@ -89,7 +88,7 @@ export default function Nav() {
 					<form id="searchForm" onSubmit={handleSubmit} className="relative flex items-center border rounded-full px-4 py-2 w-80 h-10 overflow-visible md:mr-2">
 						<div className="relative flex items-center w-72 h-10">
 							{/* Search Input */}
-							<input type="text" value={modelNumber} onChange={(e) => setModelNumber(e.target.value)} className="flex-grow outline-none text-left text-black px-4 py-2 h-9 w-full rounded-l-full" placeholder={searchType === "model" ? "Search by Model Number..." : "Search by Product Name..."} />
+							<input type="text" value={query} onChange={(e) => setModelNumber(e.target.value)} className="flex-grow outline-none text-left text-black px-4 py-2 h-9 w-full rounded-l-full" placeholder={searchType === "model" ? "Search by Model Number..." : "Search by Product Name..."} />
 
 							{/* Filter Icon Inside the Search Bar */}
 							<button type="button" onClick={handleFilterClick} className="absolute right-0 text-lime-700 px-3 focus:outline-none">

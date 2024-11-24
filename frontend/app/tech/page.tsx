@@ -81,13 +81,17 @@ export default function TechPage() {
 			{products.length > 0 ? (
 				<div className="flex justify-center w-full mt-8">
 					<div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 w-auto mx-auto">
-						{products.map((product, index) => (
-							<ProductCard
-								key={index}
-								product={product}
-								date_price_data={priceData[product.item.id] || []} // Pass unique price data for each product
-							/>
-						))}
+          {products.map((product, index) => {
+            if(product.item.currentBestPrice) {
+            return (
+              <ProductCard
+                key={index}
+                product={product}
+                date_price_data={priceData[product.item.id] || []} // Pass unique price data for each product
+              />
+            );
+          }
+          })}
 					</div>
 				</div>
 			) : (

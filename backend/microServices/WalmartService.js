@@ -72,27 +72,39 @@ HJrTIa6Ellfue4yCBfcBuN/7a4xA8ogKJiwJrCgUcopPuvIpeOxaRA==
 		}
 	}
 
-	async searchWalmart(UPC) {
-		const productUrl = `https://developer.api.walmart.com/api-proxy/service/affil/product/v2/items?upc=${UPC}`;
-		const productData = await this.fetchData(productUrl, UPC);
-
+	async searchWalmart(query, formattedType) {
+		// Update the URL to include the "query" parameter instead of "upc"
+		const productUrl = `https://developer.api.walmart.com/api-proxy/service/affil/product/v2/search`;
+	
+		const productData = await this.fetchData(productUrl, query);
+	
 		if (productData && productData.items && productData.items.length > 0) {
-			const product = productData.items[0]; // Get the first matching product
+			// Take only the first product
+			const product = productData.items[0];
 			const productDetails = {
 				name: product.name,
-				sku: product.itemId,
-				price: product.salePrice,
-				productPicture: product.mediumImage,
+				price: product.salePrice || "N/A",
+				image: product.mediumImage || "N/A",
+				modelNumber: product.modelNumber || "N/A",
+				upc: product.upc || "N/A",
 			};
 
-			console.log(`Item Name: ${productDetails.name}`);
-			console.log(`Price: $${productDetails.price}`);
-			console.log(`Store Name: Walmart`);
-			console.log(`Image URL: ${productDetails.productPicture}`);
-
-			return productDetails;
+			if (formattedType === "upc") {
+				if (!productDetails.upc || !productDetails.upc.includes(query)) {
+					console.warn("Walmart item found does not contain the specified UPC");
+					return null;
+				}
+			} else if (formattedType === "modelnumber") {
+				if (!productDetails.modelNumber || !productDetails.modelNumber.includes(query)) {
+					console.warn("Walmart item found does not contain the specified modelNumber");
+					return null;
+				}
+			}			
+	
+			return productDetails; // Return details of the first product
 		} else {
-			throw new Error("Product information not found");
+			console.warn("Product information not found from Walmart");
+			return null;
 		}
 	}
 }

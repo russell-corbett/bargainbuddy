@@ -13,7 +13,7 @@ const ProductSearch = require("./microServices/ProductSearchService");
 const axios = require("axios");
 
 const { getUserItems } = require(".//api/endpoints/user/userController");
-const { getPrices } = require(".//api/endpoints/price/priceController");
+const { getPrices, addPrice } = require(".//api/endpoints/price/priceController");
 
 const app = express();
 const port = 3001;
@@ -62,21 +62,81 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("addToWishlist", async (data) => {
-		product = await productSearch.searchProduct(data.modelNumber, "modelNumber");
+		product = await productSearch.searchProduct(data.query, "modelnumber"); //change "modelNumber" to searchType
 		// prisma.add(product, userToken)
-		const item_body = {
-			name: product[0].name,
-			modelNumber: data.modelNumber,
-			currentBestPrice: product[0].price,
-			itemImg: product[0].image,
-		};
 
-		const userItem_body = {
-			email: "zrcoffey@mun.ca",
-			modelNumber: data.modelNumber,
-		};
-		await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
-		await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
+		let betterPrice = 0;
+		if(product[1]) { //found price from walmart and bestbuy
+			if (product[0].price < product[1].price) {
+				betterPrice = 0;
+			} else {
+				betterPrice = 1;
+			}
+
+			const item_body = {
+				name: product[betterPrice].name,
+				modelNumber: product[betterPrice].modelNumber,
+				currentBestPrice: product[betterPrice].price,
+				itemImg: product[betterPrice].image,
+				currentStore: product[betterPrice].store
+			};
+
+			const userItem_body = {
+				email: "zrcoffey@mun.ca",
+				modelNumber: data.modelNumber,
+			};
+
+			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
+			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
+
+			itemId_ = await Database.getRecord("Item", {modelNumber: product[betterPrice].modelNumber});
+
+			const price_body_0 = {
+				store: product[0].store,
+				price: product[0].price,
+				itemId: itemId_.id,
+			}
+
+			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
+
+			const price_body_1 = {
+				store: product[1].store,
+				price: product[1].price,
+				itemId: itemId_.id
+			}
+
+			await addPrice({ body: price_body_1 }, { status: () => ({ json: () => {} }) });
+
+		} else if (product[0]) {
+			const item_body = {
+				name: product[0].name,
+				modelNumber: product[0].modelNumber,
+				currentBestPrice: product[0].price,
+				itemImg: product[0].image,
+				currentStore: product[0].store
+			};
+
+			const userItem_body = {
+				email: "zrcoffey@mun.ca",
+				modelNumber: data.modelNumber,
+			};
+
+			await createItem({ body: item_body }, { status: () => ({ json: () => {} }) });
+			await connectUserItem({ body: userItem_body }, { status: () => ({ json: () => {} }) });
+
+			itemId_ = await Database.getRecord("Item", {modelNumber: product[0].modelNumber});
+
+			const price_body_0 = {
+				store: product[0].store,
+				price: product[0].price,
+				itemId: itemId_.id
+			}
+
+			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
+		}
+		else {
+			console.warn("Product not found.")
+		}
 	});
 
 	socket.on("getUserItems", async (data) => {
