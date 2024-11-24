@@ -244,12 +244,13 @@
 
   .btn.transparent {
     margin: 0;
-    background: #69a79c;
-    border: 2px solid #69a79c;
+    background: #ffffff;
+    border: 2px solid #f7ba34;
     width: 130px;
     height: 41px;
     font-weight: 600;
     font-size: 0.8rem;
+    color: #f7ba34
   }
 
   .right-panel .content,
