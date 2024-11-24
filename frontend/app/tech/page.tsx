@@ -35,7 +35,7 @@ export default function TechPage() {
 
   useEffect(() => {
     // Fetch user items
-    socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
+    socket.emit("getUserItems", { email: localStorage.getItem("bargainbuddy_token") });
 
     socket.on("userItemsResponse", (response: userItemsResponse) => {
       if (response.statusCode !== 200) {

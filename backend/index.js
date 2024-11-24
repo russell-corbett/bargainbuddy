@@ -152,7 +152,7 @@ io.on("connection", (socket) => {
 			};
 
 			const userItem_body = {
-				email: "zrcoffey@mun.ca",
+				email: data.email,
 				modelNumber: item_body.modelNumber,
 			};
 
@@ -187,7 +187,7 @@ io.on("connection", (socket) => {
 			};
 
 			const userItem_body = {
-				email: "zrcoffey@mun.ca",
+				email: data.email,
 				modelNumber: item_body.modelNumber,
 			};
 
@@ -234,9 +234,13 @@ io.on("connection", (socket) => {
 		}
 	});
 
-	socket.on("createUser", ({ email, password, username }) => {
-		console.log("hello");
-		createUser({ email, password, username });
+	socket.on("createUser", async ({ email, password, username }, callback) => {
+		try {
+			const result = await createUser({ email, password, username });
+			callback({ status: "success", data: result });
+		} catch (error) {
+			callback({ status: "error", message: error.message });
+		}
 	});
 
 	socket.on("loginUser", ({ email, password }) => {
