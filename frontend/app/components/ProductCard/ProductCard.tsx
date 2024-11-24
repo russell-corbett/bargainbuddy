@@ -63,7 +63,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Front of Card */}
         <div className={`${styles.cardFront} flex flex-col`}>
           {/* Product Image */}
-          <div className="h-72 w-full overflow-hidden bg-white">
+          <div className="h-40 w-full flex items-center justify-center bg-white">
             <img
               src={product.item.itemImg}
               alt={product.item.name}
