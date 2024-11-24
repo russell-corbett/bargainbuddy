@@ -33,7 +33,14 @@ export default function TechPage() {
 
   const socket = getSocket();
 
+
   useEffect(() => {
+    const email = localStorage.getItem("bargainbuddy_token");
+    if (!email) {
+      window.location.href = "/register"; // Client-side redirect
+      return;
+    }
+
     // Fetch user items
     socket.emit("getUserItems", { email: localStorage.getItem("bargainbuddy_token") });
 
