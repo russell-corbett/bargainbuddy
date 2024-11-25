@@ -243,11 +243,6 @@ io.on("connection", (socket) => {
   
   socket.on("loginUser", ({email, password}) => {
     console.log("Socket received log-in request");
-    loginUser({email, password});
-  })
-
-  socket.on("loginUser", ({email, password}) => {
-    console.log("Socket received log-in request");
     const token = loginUser({email, password});
     if (token){
       try{

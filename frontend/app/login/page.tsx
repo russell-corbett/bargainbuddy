@@ -25,10 +25,8 @@ const LoginPage = () => {
       setLoading(true);
       setError('');
 
-      // Emit login request to the server using Socket.IO
       socket.emit('loginUser', { email, password });
 
-      // Listen for the server response
       socket.on('loginResponse', (response: LoginResponse) => {
           setLoading(false);
 
@@ -36,9 +34,8 @@ const LoginPage = () => {
               setError(response.error);
           } else {
               console.log('Login successful:', response.user);
-              //Set token to user's token
               localStorage.setItem('token', response.token);
-              // navigate using navigate('') to tech.tsx
+
           }
       });
   };
