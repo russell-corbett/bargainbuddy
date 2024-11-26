@@ -10,6 +10,9 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm ci
 
+# Ensure TypeScript is installed
+RUN npm install typescript --save-dev
+
 # Copy the rest of the application files
 COPY . .
 
