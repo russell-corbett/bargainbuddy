@@ -2,12 +2,13 @@
 
 interface LoginResponse {
 	error?: string;
-	message?: string;
+	message: string;
 	user?: {
 	  id: number;
 	  email: string;
 	};
-	token: string;
+	loginWorked: boolean;
+	email:string;
   }
 
 import { getSocket } from "../../socket";
@@ -49,11 +50,13 @@ const Signup: React.FC = () => {
       	socket.on('loginResponse', (response: LoginResponse) => {
           setLoading(false);
 
-          if (response.error) {
-              setError(response.error);
+          if (!response.loginWorked) {
+              setError(response.message);
           } else {
               console.log('Login successful:', response.user);
-              localStorage.setItem('token', response.token);
+              localStorage.setItem("bargainbuddy_token", response.email);
+			  window.location.href = "/tech";
+      		  return;
           }
       });
 		console.log("Sign-in form submitted");
@@ -79,67 +82,76 @@ const Signup: React.FC = () => {
 		}
 		try {
 			console.log("Emitting the createUser stuff");
-			socket.emit(
-			  "createUser", 
-			  {email, password, username}, 
-			  (response: { error?: string; user?: any }) => {
-				if (response.error) {
-				  console.error("Error from server:", response.error);
-				  setError(response.error); // Update UI with the error
-				  return;
+			socket.emit("createUser", { email, password, username }, (response: { status?: string; data?: any }) => {
+				if (response.status !== "success") {
+					console.error("Error from server:", response.data);
+					setError(response.data); // Update UI with the error
+          return;
 				}
-			  console.log("Successfully emitted");
-		  
+				console.log("Successfully emitted");
+
 				// Successful registration
-				const userData = response.user;
+				const userData = response.data;
 				console.log("User registered successfully:", userData);
-			  }
-			);
-		  } catch (error: unknown) {
+				localStorage.setItem("bargainbuddy_token", response.data.email);
+				window.location.href = "/tech";
+			});
+		} catch (error: unknown) {
 			if (error instanceof Error) {
-			  console.error("General error:", error.message);
-			  setError(error.message);
+				console.error("General error:", error.message);
+				setError(error.message);
 			} else {
-			  console.error("Unexpected error:", error);
-			  setError("Something went wrong!");
+				console.error("Unexpected error:", error);
+				setError("Something went wrong!");
 			}
-		  } finally {
+		} finally {
 			setLoading(false);
-		  }
-		console.log("Sign-up form submitted");
+		}
 	};
 
 	return (
 		<motion.div className={`container ${isSignUpMode ? "sign-up-mode" : ""}`} variants={fadeIn} initial="initial" animate="animate">
 			<div className="forms-container">
 				<div className="signin-signup">
-					<form action="#" className="sign-in-form" onSubmit={handleSignInSubmit}>
-						<h2 className="title">Sign in</h2>
-						<div className="input-field">
-							<FontAwesomeIcon icon={faUser} className="icon" />
-							<input type="text" placeholder="Username" />
-						</div>
-						<div className="input-field">
-							<FontAwesomeIcon icon={faLock} className="icon" />
-							<input type="password" placeholder="Password" />
-						</div>
-						<input type="submit" value="Login" className="btn solid" />
-						<p className="social-text text-black">Or Sign in with social platforms</p>
-						<div className="social-media">
-							<a href="#" className="social-icon">
-								<FontAwesomeIcon icon={faFacebookF} />
-							</a>
-							<a href="#" className="social-icon">
-								<FontAwesomeIcon icon={faTwitter} />
-							</a>
-							<a href="#" className="social-icon">
-								<FontAwesomeIcon icon={faGoogle} />
-							</a>
-							<a href="#" className="social-icon">
-								<FontAwesomeIcon icon={faLinkedinIn} />
-							</a>
-						</div>
-					</form>
+				<form action="#" className="sign-in-form" onSubmit={handleSignInSubmit}>
+					<h2 className="title">Sign in</h2>
+					<div className="input-field">
+						<FontAwesomeIcon icon={faEnvelope} className="icon" />
+						<input
+							type="email"
+							placeholder="Email"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							required
+						/>
+					</div>
+					<div className="input-field">
+						<FontAwesomeIcon icon={faLock} className="icon" />
+						<input
+							type="password"
+							placeholder="Password"
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							required
+						/>
+					</div>
+					<input type="submit" value="Login" className="btn solid" />
+					<p className="social-text text-black">Or Sign in with social platforms</p>
+					<div className="social-media">
+						<a href="#" className="social-icon">
+							<FontAwesomeIcon icon={faFacebookF} />
+						</a>
+						<a href="#" className="social-icon">
+							<FontAwesomeIcon icon={faTwitter} />
+						</a>
+						<a href="#" className="social-icon">
+							<FontAwesomeIcon icon={faGoogle} />
+						</a>
+						<a href="#" className="social-icon">
+							<FontAwesomeIcon icon={faLinkedinIn} />
+						</a>
+					</div>
+				</form>
 
 					<form action="#" className="sign-up-form" onSubmit={handleSignUpSubmit}>
 						<h2 className="title">Sign up</h2>
