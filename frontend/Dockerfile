@@ -4,33 +4,35 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Copy package.json and package-lock.json
 COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm ci
 
-# Copy application files
+# Copy the rest of the application files
 COPY . .
 
 # Build the application
 RUN npm run build
 
 # Stage 2: Serve the application
-FROM node:18-alpine AS runner
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Copy only the necessary files from the build stage
-COPY --from=builder /app/package.json ./
+# Copy necessary files from the build stage
+COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
-# Set environment variable for Next.js
-ENV NODE_ENV production
+# Set environment variable
+ENV NODE_ENV=production
 
-# Expose port 3000 for the application
+# Expose port 3000
 EXPOSE 3000
 
-# Start the Next.js application
+# Start the application
 CMD ["npm", "start"]
