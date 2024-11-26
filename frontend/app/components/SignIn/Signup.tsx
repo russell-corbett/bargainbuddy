@@ -1,5 +1,16 @@
 "use client";
 
+interface LoginResponse {
+	error?: string;
+	message?: string;
+	user?: {
+	  id: number;
+	  email: string;
+	};
+	token: string;
+  }
+
+import { getSocket } from "../../socket";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock, faEnvelope } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +23,13 @@ const fadeIn = {
 };
 
 const Signup: React.FC = () => {
+	const socket = getSocket()
+	const [username, setUsername] = useState('')
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
+	const [error, setError] = useState('');
+	const [loading, setLoading] = useState(false);
 	const [isSignUpMode, setIsSignUpMode] = useState(false);
 
 	const handleSignUpClick = () => {
@@ -22,15 +40,72 @@ const Signup: React.FC = () => {
 		setIsSignUpMode(false);
 	};
 
-	const handleSignInSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const handleSignInSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		// Handle sign-in logic here
+		setLoading(true);
+     	setError('');
+		socket.emit('loginUser', { email, password });
+
+      	socket.on('loginResponse', (response: LoginResponse) => {
+          setLoading(false);
+
+          if (response.error) {
+              setError(response.error);
+          } else {
+              console.log('Login successful:', response.user);
+              localStorage.setItem('token', response.token);
+          }
+      });
 		console.log("Sign-in form submitted");
 	};
 
-	const handleSignUpSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const handleSignUpSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		// Handle sign-up logic here
+		setLoading(true);
+        setError('');
+		if (password.length < 8)
+		{
+			setError("Password too short.")
+			setLoading(false)
+		}
+		if (!password.match(/[A-Z]/))
+		{
+			setError("Password does not contain a capital letter.")
+		}
+		if (password !== confirmPassword) {
+			setError("Passwords do not match.");
+			setLoading(false);
+			return;
+		}
+		try {
+			console.log("Emitting the createUser stuff");
+			socket.emit(
+			  "createUser", 
+			  {email, password, username}, 
+			  (response: { error?: string; user?: any }) => {
+				if (response.error) {
+				  console.error("Error from server:", response.error);
+				  setError(response.error); // Update UI with the error
+				  return;
+				}
+			  console.log("Successfully emitted");
+		  
+				// Successful registration
+				const userData = response.user;
+				console.log("User registered successfully:", userData);
+			  }
+			);
+		  } catch (error: unknown) {
+			if (error instanceof Error) {
+			  console.error("General error:", error.message);
+			  setError(error.message);
+			} else {
+			  console.error("Unexpected error:", error);
+			  setError("Something went wrong!");
+			}
+		  } finally {
+			setLoading(false);
+		  }
 		console.log("Sign-up form submitted");
 	};
 
@@ -70,15 +145,19 @@ const Signup: React.FC = () => {
 						<h2 className="title">Sign up</h2>
 						<div className="input-field">
 							<FontAwesomeIcon icon={faUser} className="icon" />
-							<input type="text" placeholder="Username" />
+							<input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required/>
 						</div>
 						<div className="input-field">
 							<FontAwesomeIcon icon={faEnvelope} className="icon" />
-							<input type="email" placeholder="Email" />
+							<input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 						</div>
 						<div className="input-field">
 							<FontAwesomeIcon icon={faLock} className="icon" />
-							<input type="password" placeholder="Password" />
+							<input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+						</div>
+						<div className="input-field">
+							<FontAwesomeIcon icon={faLock} className="icon" />
+							<input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
 						</div>
 						<input type="submit" className="btn" value="Sign up" />
 						<p className="social-text text-black">Or Sign up with social platforms</p>
