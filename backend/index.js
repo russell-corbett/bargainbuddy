@@ -21,10 +21,17 @@ const port = 3001;
 const server = http.createServer(app);
 const io = socketIO(server, {
 	cors: {
-		origin: "http://localhost:3000",
+		origin: "https://bargainbuddy.russellcorbett.ca",
 		methods: ["GET", "POST"],
 	},
 });
+
+const corsOptions = {
+  origin: 'https://bargainbuddy.russellcorbett.ca',
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 const generateToken = (email) => {
 	return jwt.sign({ email }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
@@ -92,7 +99,6 @@ const db = Database;
 const productSearch = new ProductSearch();
 
 // Enable CORS for all routes
-app.use(cors());
 app.use(express.json());
 app.use(userRoutes);
 app.use(itemRoutes);

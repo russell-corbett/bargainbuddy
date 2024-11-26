@@ -6,7 +6,7 @@ let socket;
 
 export const getSocket = () => {
   if (!socket) {
-    socket = io("http://localhost:3001");
+    socket = io("https://bargainbuddyserver.russellcorbett.ca");
   }
 
   return socket;
