@@ -1,26 +1,27 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
-  provider = "sqlite"
+  provider = "sqlite" // Change this if you're using a different DB in production
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id       Int @id @default(autoincrement())
-  email       String @unique
-  username    String @unique
-  password    String
-  displayName String?
-  avatarUrl   String?
-  items    Item[]   @relation("UserItems")
-  userItems UserItem[]
-  joinDate DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  username     String    @unique
+  password     String
+  displayName  String?
+  avatarUrl    String?
+  items        Item[]    @relation("UserItems")
+  userItems    UserItem[]
+  joinDate     DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
+
 model Item {
-  id                String     @id @default(cuid())
+  id                String       @id @default(cuid())
   name              String
   modelNumber       String?
   description       String?
@@ -28,21 +29,19 @@ model Item {
   currentBestPrice  Float?
   currentStore      String?
   priceHistory      Price[]
-  users             User[]     @relation("UserItems")
+  users             User[]       @relation("UserItems")
   userItems         UserItem[]
-  storeIds          StoreID[]
+  stores            ItemStore[]
 }
 
-// Join table for many-to-many relationship between User and Item
 model UserItem {
-  userId Int 
-  itemId String 
-  user   User @relation(fields: [userId], references: [id])
-  item   Item @relation(fields: [itemId], references: [id])
-  @@id([userId, itemId])  // Composite primary key for uniqueness
+  userId Int    // Foreign key to User
+  itemId String // Foreign key to Item
+  user   User   @relation(fields: [userId], references: [id])
+  item   Item   @relation(fields: [itemId], references: [id])
+  @@id([userId, itemId]) // Composite primary key
 }
 
-// Price history table
 model Price {
   id        String   @id @default(cuid())
   date      DateTime @default(now())
@@ -52,10 +51,10 @@ model Price {
   itemId    String
 }
 
-model StoreID {
-  id        String      @id @default(cuid())
-  store     String
-  storeId   String
+model ItemStore {
+  id        String   @id @default(cuid())
+  storeName String   // Name of the store
+  storeId   String   // Store's unique ID
   item      Item     @relation(fields: [itemId], references: [id])
   itemId    String
 }

@@ -16,9 +16,6 @@ interface Product {
   };
 }
 
-
-
-
 interface userItemsResponse {
   statusCode: number;
   data: Product[] | { error: string };
@@ -36,9 +33,16 @@ export default function TechPage() {
 
   const socket = getSocket();
 
+
   useEffect(() => {
+    const email = localStorage.getItem("bargainbuddy_token");
+    if (!email) {
+      window.location.href = "/register"; // Client-side redirect
+      return;
+    }
+
     // Fetch user items
-    socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
+    socket.emit("getUserItems", { email: localStorage.getItem("bargainbuddy_token") });
 
     socket.on("userItemsResponse", (response: userItemsResponse) => {
       if (response.statusCode !== 200) {
@@ -65,6 +69,8 @@ export default function TechPage() {
         if (exists) return prevProducts;
         return [...prevProducts, { item: newProduct }];
       });
+      // Fetch price data for the new product
+      socket.emit("getPrices", { id: newProduct.id });
     });
 
     // Listen for price data response

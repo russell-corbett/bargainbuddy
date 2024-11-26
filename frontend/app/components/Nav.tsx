@@ -28,8 +28,13 @@ export default function Nav() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault(); // Prevent page refresh on form submit
-		socket.emit("addToWishlist", { query, searchType });
-		socket.emit("getUserItems", { email: "zrcoffey@mun.ca" });
+		socket.emit("addToWishlist", { query, searchType, email: localStorage.getItem("bargainbuddy_token") });
+    const email = localStorage.getItem("bargainbuddy_token");
+		if (email) {
+      socket.emit("getUserItems", { email });
+    } else {
+      console.error("No email found in local storage");
+    }
 		setModelNumber("");
 		setIsSearchOpen(false);
 		console.log("Form submitted with query and type:", query, searchType);
