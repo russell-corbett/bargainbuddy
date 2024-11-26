@@ -37,7 +37,7 @@ export default function TechPage() {
   useEffect(() => {
     const email = localStorage.getItem("bargainbuddy_token");
     if (!email) {
-      window.location.href = "/register"; // Client-side redirect
+      window.location.href = "/accountSignIn"; // Client-side redirect
       return;
     }
 
