@@ -22,7 +22,7 @@ import {
   faLinkedinIn,
 } from "@fortawesome/free-brands-svg-icons";
 import { motion } from "framer-motion";
-import { ToastContainer, toast } from "react-toastify";
+import { Slide, ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const fadeIn = {
@@ -277,7 +277,8 @@ const Signup: React.FC = () => {
       </div>
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={4862}
+		limit={1}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -285,7 +286,8 @@ const Signup: React.FC = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="colored"
+        theme="light"
+		transition={Slide}
       />
     </motion.div>
   );
