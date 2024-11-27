@@ -8,8 +8,6 @@ services:
       - "3001:3001"
     volumes:
       - bargainbuddy-data:/app/data
-    environment:
-      - NODE_ENV=production
       # Add other environment variables if needed
 
   frontend:

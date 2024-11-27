@@ -78,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div
-      className={`${styles.productCard} w-80 h-[400px] relative bg-slate-50 rounded-xl border-neutral-200 shadow-lg hover:scale-105 duration-300`}
+      className={`${styles.productCard} w-80 h-[450px] relative bg-slate-50 rounded-xl border-neutral-200 shadow-lg hover:scale-105 duration-300`}
     >
       <div className={`${styles.cardInner} ${flipped ? styles.flipped : ""}`}>
         {/* Front of Card */}

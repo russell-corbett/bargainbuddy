@@ -1,19 +1,15 @@
-FROM node:20 as base
+FROM node:20
 
 WORKDIR /home/node/app
 
 COPY package*.json ./
 
-RUN npm i
+RUN npm install
 
 COPY . .
 
-FROM base as production
+RUN npx prisma generate
 
-ENV NODE_PATH=./build
+EXPOSE 3001
 
-RUN npm run build
-
-RUN npm run migrate
-
-CMD ["node", "dist/app.js"]
+CMD ["node", "index.js"]

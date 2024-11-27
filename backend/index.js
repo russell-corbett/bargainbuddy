@@ -37,11 +37,12 @@ const generateToken = (email) => {
 	return jwt.sign({ email }, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
 };
 
-const loginUser = async ({ email, password }) => {
+async function loginUser({ email, password }) {
 	try {
-		console.log("Logging in user:".email);
+		console.log("Logging in user:", email);
 
-		const user = await db.getRecord("user", { email });
+		const user = await db.getRecord("User", { email });
+		console.log(user)
 		if (!user) {
 			throw new Error("No account associated with email");
 		}
@@ -49,11 +50,10 @@ const loginUser = async ({ email, password }) => {
 		if (password != user.password) {
 			throw new Error("Password incorrect");
 		}
-
-		const token = generateToken(email);
-		return token;
+		return true;
 	} catch (error) {
 		console.error("Error during login:", error);
+		return false;
 	}
 };
 
@@ -183,6 +183,7 @@ io.on("connection", (socket) => {
 
 			await addPrice({ body: price_body_1 }, { status: () => ({ json: () => {} }) });
 			socket.emit("newProductAdded", item_body);
+			socket.emit("getPrices", { id: itemId_.id });
 		} else if (product[0]) {
 			const item_body = {
 				name: product[0].name,
@@ -211,6 +212,7 @@ io.on("connection", (socket) => {
 			await addPrice({ body: price_body_0 }, { status: () => ({ json: () => {} }) });
 
 			socket.emit("newProductAdded", item_body);
+			socket.emit("getPrices", { id: itemId_.id });
 		} else {
 			//if not product found
 			console.warn("Product not found.");
@@ -249,25 +251,33 @@ io.on("connection", (socket) => {
 		}
 	});
 
-	socket.on("loginUser", ({ email, password }) => {
-		console.log("Socket received log-in request");
-		loginUser({ email, password });
-	});
+//	socket.on("loginUser", ({ email, password }) => {
+//		console.log("Socket received log-in request");
+//		loginUser({ email, password });
+//	});
 
-	socket.on("loginUser", ({ email, password }) => {
+	socket.on("loginUser", async ({ email, password }) => {
 		console.log("Socket received log-in request");
-		const token = loginUser({ email, password });
-		if (token) {
+		console.log("Email is", email)
+		const loginWorked = await loginUser({ email, password });
+		console.log("Did login work", loginWorked)
+		if (loginWorked ) {
 			try {
 				console.log("User found, and logged in");
 				socket.emit("loginResponse", {
 					message: "Log-in attempt successful.",
-					token,
+					loginWorked,
+					email: email
 				});
 			} catch (error) {
 				console.log("Error logging in user.");
 				socket.emit("loginResponse", { error: "An error has occurred during login." });
 			}
+		} else {
+			socket.emit("loginResponse", {
+				message: "Log-in attempt failed.",
+				loginWorked
+			});
 		}
 	});
 
