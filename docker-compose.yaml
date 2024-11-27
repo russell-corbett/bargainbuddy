@@ -6,6 +6,7 @@ services:
     image: backend
     ports:
       - "3001:3001"
+      - "5555:5555"
     volumes:
       - bargainbuddy-data:/app/data
       # Add other environment variables if needed
